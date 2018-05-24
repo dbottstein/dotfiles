@@ -1,4 +1,4 @@
-#source $dotdir/.dotfiles/zplug/init.sh
+source $dotdir/.dotfiles/zplug/init.sh
 
 for plugin in $plugins; do
 	zplug "plugins/$plugin", from:oh-my-zsh
