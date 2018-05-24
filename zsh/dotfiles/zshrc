@@ -1,0 +1,47 @@
+# Theme from ~/.oh-my-zsh/themes/
+# Set to "random", to load a random theme each time that oh-my-zsh is loaded.
+ZSH_THEME="qoup"
+
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+MAILCHECK=0 ## disable mail checking
+WORDCHARS=${WORDCHARS//[\/=;]}
+
+CASE_SENSITIVE="false"
+HYPHEN_INSENSITIVE="true"
+DISABLE_AUTO_UPDATE="false"
+DISABLE_LS_COLORS="false"
+DISABLE_AUTO_TITLE="false"
+ENABLE_CORRECTION="true"
+COMPLETION_WAITING_DOTS="true"
+# export UPDATE_ZSH_DAYS=13
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+# ZSH_CUSTOM=/path/to/new-custom-folder
+# HIST_STAMPS="mm/dd/yyyy" # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+
+plugins=( safe-paste git git-extras gitignore git-prompt svn gradle grails brew brew-cask osx gnu-utils urltools rsync bgnotify extract dircycle emoji colorize )
+cdpath=( .. ~ ~/src )
+
+umask 022
+source $ZSH/oh-my-zsh.sh
+
+#fpath=(
+#       $zdotdir/{.[z]sh/*.zwc,{.[z]sh,[l]ib/zsh}/{functions{,.local,.$HOST},scripts}}(N)
+#       $fpath
+#      )
+#fpath=( ~/.gvm/springboot/current/shell-completion/zsh $fpath )
+
+for dirname in $fpath; do
+  case "$dirname" in
+    $zdotdir/.zsh*) fns=( $dirname/*~*~(-N.x:t) ) ;;
+#                 *) fns=( $dirname/*~*~(-N.:t)  ) ;;
+  esac
+  (( $#fns )) && autoload "$fns[@]"
+done
+
+#test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+#export SDKMAN_DIR="/Users/don/.sdkman"
+[[ -s "/Users/don/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/don/.sdkman/bin/sdkman-init.sh"
