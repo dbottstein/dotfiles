@@ -1,2 +1,2 @@
 zdotdir=${ZDOTDIR:-$HOME}
-export ZPLUG_HOME="$zdotdir/.dotfiles/zplug"
+export ZPLUG_HOME="$zdotdir/.zplug"
