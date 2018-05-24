@@ -24,7 +24,8 @@ plugins=( safe-paste git git-extras gitignore git-prompt svn gradle grails brew 
 cdpath=( .. ~ ~/src )
 
 umask 022
-source $ZSH/oh-my-zsh.sh
+#source $ZSH/oh-my-zsh.sh
+source $zdotdir/.zplugrc
 
 #fpath=(
 #       $zdotdir/{.[z]sh/*.zwc,{.[z]sh,[l]ib/zsh}/{functions{,.local,.$HOST},scripts}}(N)

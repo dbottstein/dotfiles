@@ -27,7 +27,7 @@ setopt                       \
         csh_junkie_history   \
      NO_csh_junkie_loops     \
      NO_csh_junkie_quotes    \
-     NO_csh_null_glob        \
+        csh_null_glob        \
         no_equals            \
         extended_glob        \
         extended_history     \
@@ -68,7 +68,7 @@ setopt                       \
      NO_multibyte            \
         nomatch              \
         notify               \
-     NO_null_glob            \
+        null_glob            \
         numeric_glob_sort    \
      NO_overstrike           \
         path_dirs            \
