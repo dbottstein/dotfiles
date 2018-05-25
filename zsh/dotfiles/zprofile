@@ -6,30 +6,34 @@ typeset -U manpath
 typeset -xTU PERL5LIB perl5lib
 typeset -xTU LD_LIBRARY_PATH ld_library_path
 
-export ZSH=$HOME/.oh-my-zsh
+export ZDOTDIR="$zdotdir"
 export ACTIVEMQ_HOME='/usr/local/apache-activemq-5.8.0'
 export ANT_HOME='/usr/local/apache-ant-1.9.2'
 export ANT_OPTS="-Xmx1G -XX:MaxPermSize=512m"
-export BROWSER=Safari
 export EDITOR=vi
 export LESS="-RSi"
 export PAGER="less"
-export ZDOTDIR="$zdotdir"
-export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
-#export JAVA_HOME='/c/Program\ Files/Java/jdk1.7.0_40'
-#export JAVA_HOME='/usr/local/java'
 #export GRAILS_HOME=/home/dboths001c/.gvm/grails/current
 #export GRADLE_HOME=/usr/local/gradle
 export MAVEN_OPTS='-Xmx768m -Djava.awt.headless=true'
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.ajoberstar.grgit.auth.sshagent.allow=false -Dorg.ajoberstar.grgit.auth.pageant.allow=false'
-export SDKMAN_DIR="$HOME/.sdkman"
+
 export PERL5LIB="$HOME/perl5/lib/perl5${PERL5LIB+:}${PERL5LIB}"
 export PERL_LOCAL_LIB_ROOT="$HOME/perl5${PERL_LOCAL_LIB_ROOT+:}${PERL_LOCAL_LIB_ROOT}"
 export PERL_MB_OPT="--install_base \"$HOME/perl5\""
 export PERL_MM_OPT="INSTALL_BASE=$HOME/perl5"
 
-[[ -f ~/.LESS_TERMCAP ]] && source ~/.LESS_TERMCAP
-[[ -s "${SDKMAN_DIR}/bin/sdkman-init.sh" ]] && source "${SDKMAN_DIR}/bin/sdkman-init.sh"
+case "$system" in
+    Mac)
+	export BROWSER=Safari
+	export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+	;;
+    *)
+	export BROWSER=Chrome
+	test -e /usr/local/java && export JAVA_HOME='/usr/local/java'
+esac
+
+test -f ~/.LESS_TERMCAP && source ~/.LESS_TERMCAP
 
 #path=( . ~/bin /usr/local/bin $ACTIVEMQ_HOME/bin $JAVA_HOME/bin $ANT_HOME/bin /usr/bin /bin $path )
 path=( . ~/bin $path ~/perl5/bin )

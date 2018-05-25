@@ -1,2 +1,10 @@
 zdotdir=${ZDOTDIR:-$HOME}
 export ZPLUG_HOME="$zdotdir/.zplug"
+
+case "$(uname -s)" in
+    Linux*)     system=Linux;;
+    Darwin*)    system=Mac;;
+    CYGWIN*)    system=Cygwin;;
+    MINGW*)     system=MinGw;;
+    *)          system=UNKNOWN
+esac

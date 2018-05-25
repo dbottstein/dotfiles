@@ -1,1 +1,3 @@
-[[ -s "$zdotdir/.sdkman/bin/.sdkman-init.sh" ]] && source "$zdotdir/.sdkman/bin/sdkman-init.sh"
+export SDKMAN_DIR="$zdotdir/.sdkman"
+
+[[ -s "$SDKMAN_DIR/bin/.sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
