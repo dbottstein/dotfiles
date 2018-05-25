@@ -23,7 +23,6 @@ zplug "lib/completion", from:oh-my-zsh
 zplug "$zsh/lib", from:local
 
 if [[ -f $zsh/themes/${ZSH_THEME}.zsh-theme ]]; then
-	#zplug "$zsh/themes/$ZSH_THEME.zsh-theme", as:theme, from:local
 	zplug "$zsh/themes", use:"$ZSH_THEME.zsh-theme", as:theme, from:local
 else
 	zplug "themes/$ZSH_THEME", as:theme, from:oh-my-zsh

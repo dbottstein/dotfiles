@@ -1,0 +1,48 @@
+zsh=$zdotdir/.dotfiles/zsh
+
+if [[ ! -d $ZPLUG_HOME ]]; then
+  git clone https://github.com/zplug/zplug $ZPLUG_HOME
+fi
+
+source $ZPLUG_HOME/init.zsh
+
+zmodload zsh/zprof
+
+zplug "zplug/zplug"
+
+# Prezto framework
+zplug "sorin-ionescu/prezto", \
+  use:"init.zsh", \
+  hook-build:"ln -s $ZPLUG_HOME/repos/sorin-ionescu/prezto ~/.zprezto"
+
+zstyle ':prezto:*:*' color 'yes'
+
+zstyle ':prezto:load' pmodule \
+  'environment' \
+  'terminal' \
+  'editor' \
+  'history' \
+  'utility' \
+  'spectrum' \
+  'prompt' \
+  'python' \
+  'git' \
+  'fasd' \
+  'completion' \
+  'syntax-highlighting' \
+  'autosuggestions'
+
+for plugin in $plugins; do
+  test -d $zsh/plugins/$plugin && zplug "$zsh/plugins/$plugin", from:local, defer:1
+done
+
+zstyle ':prezto:module:editor' key-bindings 'vi'
+zstyle ':prezto:module:editor' dot-expansion 'yes'
+zstyle ':prezto:module:prompt' theme 'steeef'
+
+# Custom zsh configuration
+zplug "$zsh/lib", from:local
+
+zplug check || zplug install
+zplug load
+unset zsh
