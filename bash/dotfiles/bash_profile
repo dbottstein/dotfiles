@@ -1,0 +1,147 @@
+# .bash_profile
+_lpath=
+_setenv ()  { for x; do if [ -d $x ]; then export $1=$x; break; fi; done; }
+_addlist () { for x; do if [ -d $x ]; then eval "export $1=\$${1}:$x"; break; fi; done; }
+_addpath () { if [ -d $1 ]; then _lpath=$_lpath:$1; fi; }
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+BASH_ENV=$HOME/.bashrc
+USERNAME=""
+HISTIGNORE="[   ]*:&:bg:fg"
+
+export USERNAME BASH_ENV HISTIGNORE
+export CVS_RSH=ssh
+export DISTCC_DIR=/var/tmp/portage/.distcc
+export LS_OPTIONS='-F'
+export MOZ_DISABLE_PANGO=1
+export PRINTER=lp
+export SPRO_LAUNCH_EDITOR_FROM_PATH=t
+export GDK_USE_XFT=1
+#export WINDOW_MANAGER=sawfish
+
+_setenv ANT_HOME     /usr/java/apache-ant-1.6.2
+#_setenv CLASSPATH    /usr/lib/netscape/java/classes
+_setenv CVSROOT      ${HOME}/cvsroot
+_setenv CATALINA_HOME /opt/local/share/java/tomcat5
+#_setenv JAVA_HOME    ${HOME}/.gentoo/java-config-2/current-user-vm/
+#_setenv JAVA_HOME    /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+_setenv JAVA_HOME=`/usr/libexec/java_home -v 1.7`
+#_setenv JAVA_HOME    /Library/Jave/Home
+_setenv J2EE_HOME    ~/java/j2sdkee1.4
+_setenv OPENWINHOME  /usr/openwin
+_setenv TCL_LIBRARY  /usr/lib/tcl8.4 /usr/lib/tcl7.5 /usr/lib/tcl7.4
+_setenv TK_LIBRARY   /usr/lib/tk8.4 /usr/lib/tk4.1 /usr/lib/tk4.0
+
+if [ -z "$DISPLAY" ]; then
+   if [ -z "$REMOTEHOST" ]; then
+      export DISPLAY=${REMOTEHOST}:0.0
+   else
+      export DISPLAY=${HOST}:0.0
+   fi
+fi
+
+export INFOPATH=${HOME}/lib/info
+_addlist INFOPATH /usr/local/info
+_addlist INFOPATH /usr/lib/xemacs-20.4/info
+
+export MANPATH=/opt/local/share/man:$MANPATH
+export MANPATH=${HOME}/man
+_addlist MANPATH /opt/local/share/man
+_addlist MANPATH /usr/local/man
+_addlist MANPATH /usr/local/share/man
+_addlist MANPATH /opt/SUNWspro/man
+_addlist MANPATH /usr/man
+_addlist MANPATH /usr/share/man
+_addlist MANPATH /usr/X11/man
+if [ -d /opt/WindowMaker ]; then
+   _addlist MANPATH /opt/WindowMaker/man
+fi
+if [ -n "$OPENWINHOME" ]; then
+   _addlist MANPATH '$OPENWINHOME/man'
+fi
+
+export LD_LIBRARY_PATH=${HOME}/lib
+_addlist LD_LIBRARY_PATH /home/don/lib
+_addlist LD_LIBRARY_PATH ${HOME}/src/RMCore/lib
+_addlist LD_LIBRARY_PATH ${HOME}/src/RMEngines/lib
+_addlist LD_LIBRARY_PATH /usr/local/lib
+_addlist LD_LIBRARY_PATH /usr/lib
+_addlist LD_LIBRARY_PATH /lib
+_addlist LD_LIBRARY_PATH /usr/X11R6/lib
+_addlist LD_LIBRARY_PATH /usr/dt/lib
+_addlist LD_LIBRARY_PATH /usr/local/nspr/lib
+_addlist LD_LIBRARY_PATH /usr/local/lib/gtk/themes/engines
+if [ -d /opt/WindowMaker ]; then
+   _addlist LD_LIBRARY_PATH /opt/WindowMaker/lib
+fi
+if [ -n "$OPENWINHOME" ]; then
+   _addlist LD_LIBRARY_PATH $OPENWINHOME/lib
+fi
+
+_addpath /usr/local/bin
+_addpath $JAVA_HOME/bin
+#_addpath ~/java/j2sdkee1.4/bin
+#_addpath /usr/java/apache-ant-1.6.2/bin
+_addpath /usr/lib/distcc/bin
+_addpath /usr/local/maven/bin
+_addpath /opt/SUNWspro/bin
+_addpath /opt/SUNWspro/SC4.0/bin
+_addpath /usr/ccs/bin
+_addpath /opt/WindowMaker/bin
+_addpath /usr/X11/bin
+_addpath /usr/openwin/bin
+_addpath /usr/games
+_addpath /opt/local/bin
+_addpath /opt/local/sbin
+
+#export PATH=.:${HOME}/bin:${_lpath}:/usr/bin:/bin
+export PATH=.:${HOME}/bin:${_lpath}:/usr/bin:/bin:/usr/sbin:/sbin
+export CDPATH=.:..:${HOME}:${HOME}/src:/projects
+
+if [ -n "`which dircolors`" ]; then
+	if [ -f ${HOME}/.dir_colors ]; then
+       eval `dircolors ${HOME}/.dir_colors`
+	fi
+	export LS_OPTIONS="$LS_OPTIONS --color=auto"
+fi
+
+unset _setenv
+unset _addlist
+unset _addpath
+unset _lpath
+
+# commands to perform at login
+
+if [ -f ${HOME}/.bashrc ]; then source ${HOME}/.bashrc; fi
+
+if [ ! -e $OPENWINHOME/bin/openwin ]; then
+	mychoice=sunview
+fi
+
+if [ -e /usr/bin/X11/startx ]; then
+	mychoice=X
+fi
+
+echo ""
+#click -n	# click -n turns off key click
+
+echo ""
+
+#unset mychoice
+#echo -n "Starting X (type Control-C to interrupt)"
+#sleep 5
+#startx
+#clear		# get rid of annoying cursor rectangle
+#echo -n "Automatically logging out (type Control-C to interrupt)"
+#sleep 5
+#logout		# logout after leaving windows system
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/Users/don/.sdkman"
+[[ -s "/Users/don/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/don/.sdkman/bin/sdkman-init.sh"
