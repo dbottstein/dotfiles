@@ -32,6 +32,9 @@ zstyle ':prezto:load' pmodule \
   'syntax-highlighting' \
   'autosuggestions'
 
+zplug "Tarrasch/zsh-autoenv"
+zplug "Tarrasch/zsh-bd"
+
 for plugin in $plugins; do
   test -d $zsh/plugins/$plugin && zplug "$zsh/plugins/$plugin", from:local, defer:1
 done
