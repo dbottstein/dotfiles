@@ -20,12 +20,17 @@ COMPLETION_WAITING_DOTS="true"
 # ZSH_CUSTOM=/path/to/new-custom-folder
 # HIST_STAMPS="mm/dd/yyyy" # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 
-plugins=( safe-paste git git-extras gitignore git-prompt svn gradle grails brew brew-cask osx gnu-utils urltools rsync bgnotify extract dircycle emoji colorize )
+plugins_prezto=( homebrew )
+plugins_omz=( osx safe-paste git-extras gitignore git-prompt gradle grails gnu-utils urltools rsync bgnotify extract dircycle emoji colorize )
+plugins_github=( Tarrasch/zsh-bd )
+plugins_local=( git mvn sdkman iterm2 )
+
 cdpath=( .. ~ ~/src )
+fpath=( ~/lib/functions $fpath )
 
 umask 022
-#source $ZSH/oh-my-zsh.sh
-source $zdotdir/.zplugrc.prezto
+
+source $zdotdir/.dotfiles/zsh/dot/zplugrc.prezto
 
 #fpath=(
 #       $zdotdir/{.[z]sh/*.zwc,{.[z]sh,[l]ib/zsh}/{functions{,.local,.$HOST},scripts}}(N)
@@ -41,8 +46,3 @@ for dirname in $fpath; do
   (( $#fns )) && autoload "$fns[@]"
 done
 
-#test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-#export SDKMAN_DIR="/Users/don/.sdkman"
-[[ -s "/Users/don/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/don/.sdkman/bin/sdkman-init.sh"

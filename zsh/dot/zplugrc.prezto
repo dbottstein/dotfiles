@@ -1,51 +1,64 @@
 zsh=$zdotdir/.dotfiles/zsh
 
+typeset -U prezto_modules=( \
+	'environment' \
+	'terminal' \
+	'prompt' \
+	'editor' \
+	'history' \
+	'utility' \
+	'spectrum' \
+	'python' \
+	'git' \
+	'rsync' \
+	'completion' \
+	'syntax-highlighting' \
+	'history-substring-search' \
+	'fasd' \
+	'autosuggestions' \
+	$plugins_prezto )
+
 if [[ ! -d $ZPLUG_HOME ]]; then
-  git clone https://github.com/zplug/zplug $ZPLUG_HOME
+    git clone https://github.com/zplug/zplug $ZPLUG_HOME
 fi
 
 source $ZPLUG_HOME/init.zsh
 
 zmodload zsh/zprof
 
-zplug "zplug/zplug"
+zplug "zplug/zplug", hook-build:'zplug --self-manage'
 
 # Prezto framework
 zplug "sorin-ionescu/prezto", \
-  use:"init.zsh", \
-  hook-build:"ln -s $ZPLUG_HOME/repos/sorin-ionescu/prezto ~/.zprezto"
+    use:"init.zsh", \
+    hook-build:"ln -s $ZPLUG_HOME/repos/sorin-ionescu/prezto ~/.zprezto"
+
+#zplug "arialdomartini/oh-my-git", as:command, use:"prompt.sh", defer:3
+#zplug "arialdomartini/oh-my-git", as:command, use:"prompt.sh", rename-to:"prompt_ohmygit_setup"
+#    on:"sorin-ionescu/prezto", \
+#    hook-build:"ln -fs $ZPLUG_HOME/repos/arialdomartini/oh-my-git/prompt.sh ~/.zprezto/modules/prompt/functions/prompt_ohmygit_setup"
 
 zstyle ':prezto:*:*' color 'yes'
-
-zstyle ':prezto:load' pmodule \
-  'environment' \
-  'terminal' \
-  'editor' \
-  'history' \
-  'utility' \
-  'spectrum' \
-  'prompt' \
-  'python' \
-  'git' \
-  'fasd' \
-  'completion' \
-  'syntax-highlighting' \
-  'autosuggestions'
-
-zplug "Tarrasch/zsh-autoenv"
-zplug "Tarrasch/zsh-bd"
-
-for plugin in $plugins; do
-  test -d $zsh/plugins/$plugin && zplug "$zsh/plugins/$plugin", from:local, defer:1
-done
-
 zstyle ':prezto:module:editor' key-bindings 'vi'
 zstyle ':prezto:module:editor' dot-expansion 'yes'
 zstyle ':prezto:module:prompt' theme 'steeef'
+zstyle ':prezto:load' pmodule $prezto_modules
+
+for plugin in $plugins_omz; do
+    zplug "plugins/$plugin", from:oh-my-zsh
+done
+
+for plugin in $plugins_github; do
+    zplug "$plugin", from:github
+done
+
+for plugin in $plugins_local; do
+    zplug "$zsh/plugins/$plugin", from:local
+done
 
 # Custom zsh configuration
 zplug "$zsh/lib", from:local
 
 zplug check || zplug install
 zplug load
-unset zsh
+unset zsh prezto_modules

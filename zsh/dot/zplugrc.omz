@@ -1,31 +1,37 @@
 zsh=$zdotdir/.dotfiles/zsh
 
 if [[ ! -d $ZPLUG_HOME ]]; then
-  git clone https://github.com/zplug/zplug $ZPLUG_HOME
-  #source $ZPLUG_HOME/init.zsh && zplug update --self
+    git clone https://github.com/zplug/zplug $ZPLUG_HOME
+    #source $ZPLUG_HOME/init.zsh && zplug update --self
 fi
 
 source $ZPLUG_HOME/init.zsh
 
 zplug "lib/*", from:oh-my-zsh
 
-for plugin in $plugins; do
-	zplug "plugins/$plugin", from:oh-my-zsh, defer:1
-	test -d $zsh/plugins/$plugin && zplug "$zsh/plugins/$plugin", from:local, defer:1
-done
-
-zplug "Tarrasch/zsh-autoenv"
-zplug "Tarrasch/zsh-bd"
 zplug "zsh-users/zsh-syntax-highlighting", defer:3
 zplug "zsh-users/zsh-autosuggestions", defer:3
 #zplug "zsh-users/zsh-completions"
 zplug "lib/completion", from:oh-my-zsh
+
+for plugin in $plugins_omz; do
+    zplug "plugins/$plugin", from:oh-my-zsh
+done
+
+for plugin in $plugins_github; do
+    zplug "$plugin", from:github
+done
+
+for plugin in $plugins_local; do
+    zplug "$zsh/plugins/$plugin", from:local
+done
+
 zplug "$zsh/lib", from:local
 
 if [[ -f $zsh/themes/${ZSH_THEME}.zsh-theme ]]; then
-	zplug "$zsh/themes", use:"$ZSH_THEME.zsh-theme", as:theme, from:local
+    zplug "$zsh/themes", use:"$ZSH_THEME.zsh-theme", as:theme, from:local
 else
-	zplug "themes/$ZSH_THEME", as:theme, from:oh-my-zsh
+    zplug "themes/$ZSH_THEME", as:theme, from:oh-my-zsh
 fi
 
 zplug check || zplug install
