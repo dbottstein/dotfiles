@@ -2,10 +2,6 @@
 #autoload
 
 # sdk zsh completion
-# inspired by
-#	https://github.com/yerinle/oh-my-zsh/commit/74526e64dc57ffdfa264319c59ffd502de6fc014
-#	https://github.com/Bash-it/bash-it/blob/master/completion/available/sdkman.completion.bash
-# 	https://github.com/sdkman/sdkman-cli/blob/master/src/main/bash/sdkman-list.sh
 
 #       install   or i    <candidate> [version]
 #       uninstall or rm   <candidate> <version>
@@ -22,116 +18,155 @@
 #       update
 #       flush             <candidates|broadcast|archives|temp>
 
-function _sdk_complete_commands_ {
-	local -a _sdk_commands_=(
-	  'install:install <candidate> [version]'
-	  'uninstall:uninstall <candidate> [version]'
-	  'list:list [candidate]'
-	  'use:use <candidate> [version]'
-	  'default:set the default <candidate> [version]'
-	  'current:dispaly current <candidate>'
-	  'upgrade:upgrade <candidate>'
-	  'version:display the current version of sdk'
-	  'broadcast:display the last broadcast message'
-	  'help:show the sdk help message'
+_sdk_commands() {
+	local -a commands=(
+	  {install,i}':install <candidate> [version]'
+	  {uninstall,rm}':uninstall <candidate> [version]'
+	  {list,l}':list [candidate]'
+	  {use,u}':use <candidate> [version]'
+	  {default,d}':set the default <candidate> [version]'
+	  {current,c}':dispaly current <candidate>'
+	  {upgrade,ug}':upgrade <candidate>'
+	  {version,v}':display the current version of sdk'
+	  {broadcast,b}':display the last broadcast message'
+	  {help,h}':show the sdk help message'
 	  'offline:set offline status [enable|disable]'
 	  'selfupdate:update the sdk [force]'
-	  'update:update sdk metadata'
-	  'flush:flush <candidates|broadcast|archives|temp>'
+	  'update:update sdk metadata't	  'flush:flush <candidates|broadcast|archives|temp>'
 	)
 
-	_describe -t commands "sdk commands" _sdk_commands_
+	_describe -t commands "sdk commands" commands
 }
 
-function _sdk_complete_candidates_ {
-	if [[ "$SDKMAN_AVAILABLE" == "false" ]]; then
-		_message "sdk is offline."
-		local -a candidates=( $(ls $SDKMAN_CANDIDATES_DIR) )
-	else
-		local -a candidates=( $(__sdkman_secure_curl "${SDKMAN_LEGACY_API}/candidates" | tr ',' ' ') )
+_sdk_candidates() {
+	local -a installed_candidates other_candidates
+	
+	installed_candidates=( $(_call_program - "/bin/ls $SDKMAN_CANDIDATES_DIR 2>/dev/null") )
 
-		_describe -t candidates "candidates" candidates
+	if [[ "$SDKMAN_AVAILABLE" != "false" ]]; then
+		other_candidates=( "${(@s/,/)$(__sdkman_secure_curl ${SDKMAN_LEGACY_API}/candidates)}" )
+	else
+		other_candidate=( ${(@s/,/)$SDK_CANDIDATES_CSV} )
+	fi
+	
+	if [[ $#installed_candidates -gt 0 ]]; then
+		for i in $installed_candidates; do
+			other_candidates[$other_candidates[(i)$i]]=()
+		done
+
+		_alternative \
+			"installed-candidates:Installed Candidates:($installed_candidates)" \
+			"other-candidates:Other Candidates:($other_candidates)"
+	else
+		_describe 'Candidates' other_candidates
 	fi
 }
 
-function _sdk_complete_local_candidates_ {
+_sdk_local_candidates() {
 	local -a candidates=( $(_call_program path /bin/ls $SDKMAN_CANDIDATES_DIR 2>/dev/null) )
-#	_files -W $SDKMAN_CANDIDATES_DIR && return 0
 	_describe -t candidates "candidates" candidates
 }
 
-function _sdk_complete_versions_ {
-	candidate="$1"
+_sdk_versions() {
+	local -a installed_versions other_versions
+	local candidate="$words[2]"
 
-	if [[ "$SDKMAN_AVAILABLE" == "false" ]]; then
-		_message "sdk is offline; showing local versions"
-		_sdk_complete_local_versions_ $words[2]
+	installed_versions=( "${(@s/,/)$(__sdkman_build_version_csv $candidate)}" )
+
+	if [[ "$SDKMAN_AVAILABLE" != "false" ]]; then
+		other_versions=( $(__sdkman_secure_curl ${SDKMAN_LEGACY_API}/candidates/$candidate/list | awk '/[0-9]+\.[0-9]+/ { print $1, $2, $3, $4 }') )
+
+		if [[ $#installed_versions -gt 0 ]]; then
+			for i in $installed_versions; do
+				other_versions[$other_versions[(i)$i]]=()
+			done
+
+			case "$words[1]" in
+				install|i)
+					_message "Installed Versions: $installed_versions"
+					_describe 'Available Versions' other_versions
+					;;
+				*)
+					_alternative \
+						"installed-versions:Installed Versions:($installed_versions)" \
+						"other-versions:Other Versions:($other_versions)"
+					;;
+			esac
+		else
+			_describe 'Available Versions' other_versions
+		fi
 	else
-		local -a versions=( $(__sdkman_secure_curl "${SDKMAN_LEGACY_API}/candidates/$candidate" | tr ',' ' ') )
-
-		_describe -t versions "available versions" versions
+		_message "sdk is offline"
 	fi
 }
 
-function _sdk_complete_local_versions_ {
-	local candidate versions_csv
-
-	candidate="$1"
-	versions_csv="$(__sdkman_build_version_csv $candidate)"
-
-	local versions=($(echo ${versions_csv//,/ }))
+_sdk_local_versions() {
+	local candidate="$words[2]"
+	local -a versions=( "${(@s/,/)$(__sdkman_build_version_csv $candidate)}" )
 
 	if [[ -z "${versions[@]}" ]]; then
 		_message "None installed!"
     else
-		_describe -t versions "installed versions" versions
+		_describe -t versions "Installed Versions" versions
 	fi
 }
 
-_sdkman_complete() {
+_sdk_complete() {
 	local context state state_descr line
 	typeset -A opt_args
+	
+	local -a flush_options offline_options selfupdate_options \
+			candidates versions
 
-	_arguments -s -S '*:: :->subcmds' && return 0
-
-	if (( CURRENT == 1 )); then
-		_sdk_complete_commands_
-	elif (( CURRENT == 2 )); then
-		case "$words[1]" in
-			install|i|list|l)
-				_sdk_complete_candidates_
-				;;
-
-			uninstall|rm|use|u|current|c|default|d|upgrade|ug)
-				_sdk_complete_local_candidates_
-				;;
-
-			offline)
-				local -a flags=( enable disable )
-				_describe -t commands "" flags
-				;;
-
-			selfupdate)
-				local -a flags=( force )i
-				_describe -t commands "" flags
-				;;
-
-			flush)
-				local -a options=( candidates broadcast archives temp )
-				_describe -t commands "" options
-				;;
-		esac
-	elif (( CURRENT == 3 )); then
-		case "$words[1]" in
-			install|i|use|u|default|d)
-				_sdk_complete_versions_ $words[2]
-				;;
-
-			uninstall|rm)
-				_sdk_complete_local_versions_ $words[2]
-				;;
-		esac
-	fi
+	_arguments '1: :_sdk_commands' \
+			   '*:: :_sdk_arguments' \
+		&& return 0
 }
 
-_sdkman_complete
+_sdk_arguments() {
+	case "$words[1]" in
+		list|l)
+			_arguments	'1:: :_sdk_candidates' && return 0
+			;;
+
+		upgrade|ug|current|c)
+			_arguments	'1:: :_sdk_local_candidates' && return 0
+			;;
+
+		install|i|use|u)
+			_arguments	'1: :_sdk_candidates' \
+						'2:: :_sdk_versions' \
+						&& return 0
+			;;
+
+		uninstall|rm)
+			_arguments	'1: :_sdk_local_candidates' \
+						'2: :_sdk_local_versions' \
+						&& return 0
+			;;
+
+		default|d)
+			_arguments	'1: :_sdk_local_candidates' \
+						'2:: :_sdk_local_versions' \
+						&& return 0
+			;;
+			
+		offline)
+			_arguments '1:offline options:(enable disable)' && return 0
+			;;
+
+		selfupdate)
+			_arguments '1:selfupdate options:(force)' && return 0
+			;;
+
+		flush)
+			_arguments '1:flush options:(candidates broadcast archives temp)' && return 0
+			;;
+
+		*)
+			_message 'no more arguments' && return 0
+			;;
+	esac
+}
+
+_sdk_complete "$@"
