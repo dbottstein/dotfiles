@@ -3,20 +3,21 @@ zsh=$zdotdir/.dotfiles/zsh
 typeset -U prezto_modules=( \
 	'environment' \
 	'terminal' \
-	'prompt' \
 	'editor' \
 	'history' \
 	'utility' \
 	'spectrum' \
 	'python' \
-	'git' \
 	'rsync' \
+	'git' \
+	'prompt' \
 	'completion' \
 	'syntax-highlighting' \
 	'history-substring-search' \
-	'fasd' \
 	'autosuggestions' \
-	$plugins_prezto )
+	'fasd' \
+	$plugins_prezto \
+)
 
 if [[ ! -d $ZPLUG_HOME ]]; then
     git clone https://github.com/zplug/zplug $ZPLUG_HOME

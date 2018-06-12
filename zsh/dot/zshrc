@@ -1,5 +1,3 @@
-# Theme from ~/.oh-my-zsh/themes/
-# Set to "random", to load a random theme each time that oh-my-zsh is loaded.
 ZSH_THEME="qoup"
 
 HISTFILE=~/.histfile
@@ -21,16 +19,20 @@ COMPLETION_WAITING_DOTS="true"
 # HIST_STAMPS="mm/dd/yyyy" # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 
 plugins_prezto=( homebrew )
-plugins_omz=( osx safe-paste git-extras gitignore git-prompt gradle grails gnu-utils urltools rsync bgnotify extract dircycle emoji colorize )
-plugins_github=( Tarrasch/zsh-bd )
-plugins_local=( git mvn sdkman iterm2 )
-
-cdpath=( .. ~ ~/src )
-fpath=( ~/lib/functions $fpath )
+plugins_omz=( osx safe-paste git-extras gitignore git-prompt gradle grails gnu-utils urltools rsync extract dircycle emoji colorize )
+plugins_github=( Tarrasch/zsh-autoenv Tarrasch/zsh-bd )
+plugins_local=( git mvn sdkman iterm2 run-help )
 
 umask 022
 
+autoload -U zsh-mime-setup
+zsh-mime-setup
+
 source $zdotdir/.dotfiles/zsh/dot/zplugrc.prezto
+
+path=( . ~/bin $path )
+cdpath=( .. ~ ~/src )
+fpath=( ~/lib/functions $fpath )
 
 #fpath=(
 #       $zdotdir/{.[z]sh/*.zwc,{.[z]sh,[l]ib/zsh}/{functions{,.local,.$HOST},scripts}}(N)

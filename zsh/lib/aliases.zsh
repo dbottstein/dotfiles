@@ -45,7 +45,7 @@ case $OSTYPE in
         ;;
 
     darwin*)
-        alias -- acroread="open -a Adobe\ Reader"
+        alias -- acroread="open -a Adobe\ Acrobat\ Reader\ DC"
         alias -- mark='open -a MacDown'
         alias -- preview='open -a Preview'
 
@@ -73,18 +73,10 @@ if [ ${ZSH_VERSION//\./} -ge 420 ]; then
   for ft in $_media_fts ; do alias -s $ft=mplayer ; done
 
   #read documents
-  alias -s pdf="open -a Preview"
   alias -s ps=gv
   alias -s dvi=xdvi
   alias -s chm=xchm
   alias -s djvu=djview
-
-  #list whats inside packed file
-  alias -s zip="unzip -l"
-  alias -s rar="unrar l"
-  alias -s tar="tar tf"
-  alias -s tar.gz="tar tzf"
-  alias -s ace="unace l"
 fi
 
 # Command line head / tail shortcuts
