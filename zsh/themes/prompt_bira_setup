@@ -1,0 +1,81 @@
+function +vi-git-status() {
+    local stats=( $(oh_my_git_info) )
+	local changed=$(( $stats[4] + $stats[6] ))
+
+    local format1="%F{81}%b"
+    local format2="|"
+  	local format3="|%F{118}%a%f"
+
+    if [ "$stats[15]" -ne "0" ]; then
+    	format1="$format1%{↓%G%}$stats[15]"		# commits behind
+    fi
+    if [ "$stats[16]" -ne "0" ]; then
+    	format1="$format1%{↑%G%}$stats[16]"		# commits ahead
+    fi
+    
+    format1+="%f"
+
+    if [ "$stats[8]" -ne "0" ]; then
+    	format2+="%F{118}%{●%G%}$stats[8]%f"		# staged
+    fi
+    if [ "$stats[10]" -ne "0" ]; then
+    	format2+="%{$fg[red]%}%{✖%G%}$stats[10]%f"	# conflicts
+    fi
+    if [ "$changed" -ne "0" ]; then
+    	format2+="%F{135}%{✚%G%}$changed%f"			# changed
+    fi
+    if [ "$stats[2]" -ne "0" ]; then
+    	format2+="%F{124}%{…%G%}$stats[2]%f"		# untracked
+    fi
+    if [[ "$format2" == "|" ]]; then
+    	format2+="%{$fg_bold[green]%}%{✔%G%}%f"		# clean
+    fi
+
+#	zstyle ':vcs_info:*:prompt:*' unstagedstr "${unstaged_format}"
+#	zstyle ':vcs_info:*:prompt:*' stagedstr "${staged_format}"
+	zstyle ':vcs_info:*:prompt:*' formats "<${format1}" "${format2}>"
+#	zstyle ':vcs_info:*:prompt:*' actionformats "${format1}" "${format2}" "${format3}"
+}
+
+function prompt_bira_precmd() {
+  vcs_info 'prompt'
+}
+
+function prompt_bira_setup() {
+	autoload -Uz add-zsh-hook vcs_info
+
+	#local return_code='%(?..%F{red}%? ↵%f)'
+	local return_code='%(?..%F{red}%? %f)'
+	local user_host='%F{118}%n@%m%f'
+	local current_dir='%B%F{blue}%~%f%b'
+	local prompt_symbol
+
+	case "$OSTYPE" in
+		darwin)
+			prompt_symbol=""
+			;;
+		cygwin)
+			prompt_symbol=""
+			;;
+		linux*)
+			prompt_symbol=""
+			;;
+		*)
+			prompt_symbol="$"
+			;;
+	esac
+
+	# Add hook for calling vcs_info before each command.
+	add-zsh-hook precmd prompt_bira_precmd
+
+	# Set vcs_info parameters.
+	zstyle ':vcs_info:*' enable git
+	zstyle ':vcs_info:*:prompt:*' check-for-changes true
+	zstyle ':vcs_info:git+post-backend:prompt:*' hooks git-status
+
+	PROMPT="╭─${user_host}  ${current_dir}  "'${vcs_info_msg_0_}${vcs_info_msg_1_}${vcs_info_msg_2_}'"
+╰─%B${prompt_symbol}%b "
+	RPS1="${return_code}"
+}
+
+prompt_bira_setup "$@"
