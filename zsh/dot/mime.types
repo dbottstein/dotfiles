@@ -1,0 +1,8 @@
+application/pdf			pdf
+application/x-zip		zip
+application/x-rar		rar
+application/x-tar		tar
+application/x-tar-gz	tar.gz
+
+text/html			html htm
+

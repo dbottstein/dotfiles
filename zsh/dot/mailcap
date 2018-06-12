@@ -1,0 +1,7 @@
+application/pdf;		open -a "Adobe Acrobat Reader DC" "%s"
+application/x-zip;		unzip -l "%s";needsterminal;copiousoutput
+application/x-rar;		unrar l "%s";needsterminal;copiousoutput
+application/x-tar;		tar tf "%s";needsterminal;copiousoutput
+application/x-tar-gz;	tar tzf "%s";needsterminal;copiousoutput
+
+text/html;				open -a "Safari" "%s"
