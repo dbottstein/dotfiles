@@ -1,34 +1,35 @@
 function +vi-git-status() {
-    local stats=( $(oh_my_git_info) )
-	local changed=$(( $stats[4] + $stats[6] ))
+	oh_my_git_status
+
+	local changed=$(( $oh_my_git_info[modifications] + $oh_my_git_info[deletions] ))
 
     local format1="%F{81}%b"
     local format2="|"
   	local format3="|%F{118}%a%f"
 
-    if [ "$stats[15]" -ne "0" ]; then
-    	format1="$format1%{↓%G%}$stats[15]"		# commits behind
+    if [ "$oh_my_git_info[behind]" -ne "0" ]; then
+    	format1="$format1%{↓%G%}$oh_my_git_info[behind]"		# commits behind
     fi
-    if [ "$stats[16]" -ne "0" ]; then
-    	format1="$format1%{↑%G%}$stats[16]"		# commits ahead
+    if [ "$oh_my_git_info[ahead]" -ne "0" ]; then
+    	format1="$format1%{↑%G%}$oh_my_git_info[ahead]"		# commits ahead
     fi
     
     format1+="%f"
 
-    if [ "$stats[8]" -ne "0" ]; then
-    	format2+="%F{118}%{●%G%}$stats[8]%f"		# staged
+    if [ "$oh_my_git_info[staged]" -ne "0" ]; then
+    	format2+="%F{118}%{●%G%}$oh_my_git_info[staged]%f"			# staged
     fi
-    if [ "$stats[10]" -ne "0" ]; then
-    	format2+="%{$fg[red]%}%{✖%G%}$stats[10]%f"	# conflicts
+    if [ "$oh_my_git_info[conflicts]" -ne "0" ]; then
+    	format2+="%{$fg[red]%}%{✖%G%}$oh_my_git_info[conflicts]%f"	# conflicts
     fi
     if [ "$changed" -ne "0" ]; then
-    	format2+="%F{135}%{✚%G%}$changed%f"			# changed
+    	format2+="%F{135}%{✚%G%}$changed%f"								# changed
     fi
-    if [ "$stats[2]" -ne "0" ]; then
-    	format2+="%F{124}%{…%G%}$stats[2]%f"		# untracked
+    if [ "$oh_my_git_info[untracked]" -ne "0" ]; then
+    	format2+="%F{124}%{…%G%}$oh_my_git_info[untracked]%f"			# untracked
     fi
     if [[ "$format2" == "|" ]]; then
-    	format2+="%{$fg_bold[green]%}%{✔%G%}%f"		# clean
+    	format2+="%{$fg_bold[green]%}%{✔%G%}%f"							# clean
     fi
 
 #	zstyle ':vcs_info:*:prompt:*' unstagedstr "${unstaged_format}"
