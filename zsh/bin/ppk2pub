@@ -1,0 +1,7 @@
+#!/bin/sh
+
+puttygen $1
+chmod 600 ${2}_rsa
+ssh-keygen -e -f ${2}_rsa > ${2}_rsa_com.pub    
+ssh-keygen -i -f ${2}_rsa_com.pub > ${2}_rsa.pub
+rm -f ${2}_rsa_com.pub

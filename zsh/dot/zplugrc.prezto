@@ -36,11 +36,6 @@ zplug "sorin-ionescu/prezto", \
     use:"init.zsh", \
     hook-build:"ln -s $ZPLUG_HOME/repos/sorin-ionescu/prezto ~/.zprezto"
 
-#zplug "arialdomartini/oh-my-git", as:command, use:"prompt.sh", defer:3
-#zplug "arialdomartini/oh-my-git", as:command, use:"prompt.sh", rename-to:"prompt_ohmygit_setup"
-#    on:"sorin-ionescu/prezto", \
-#    hook-build:"ln -fs $ZPLUG_HOME/repos/arialdomartini/oh-my-git/prompt.sh ~/.zprezto/modules/prompt/functions/prompt_ohmygit_setup"
-
 zstyle ':prezto:*:*' color 'yes'
 zstyle ':prezto:module:editor' key-bindings 'vi'
 zstyle ':prezto:module:editor' dot-expansion 'yes'
