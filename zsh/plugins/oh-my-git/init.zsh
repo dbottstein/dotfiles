@@ -1,7 +1,11 @@
-# Based on the good work of arialdomartini (https://github.com/arialdomartini/oh-my-git)
-# and bric3 (https://github.com/bric3/oh-my-zsh-git)
-
-function oh_my_git_status {
+# A variation of oh-my-git based on the good work of
+# 	arialdomartini (https://github.com/arialdomartini/oh-my-git)
+# 	bric3 (https://github.com/bric3/oh-my-zsh-git)
+#
+# Here we just gather the information and add them to the global associative array oh_my_git_info.
+# Presentation is left to the themes.
+#
+function +vi-oh-my-git-status {
 	typeset -gA oh_my_git_info=();
 
 	# Early return if git repo is configured to be hidden
@@ -117,3 +121,5 @@ function git_current_action () {
 	echo -n $action
 }
 
+# register vcs hook to gather the git information
+zstyle ':vcs_info:git*+post-backend:prompt:*' hooks oh-my-git-status

@@ -1,69 +1,52 @@
-function +vi-git-status() {
-	oh_my_git_status
-
-	local changed=$(( $oh_my_git_info[modifications] + $oh_my_git_info[deletions] ))
-
-    local format1="%F{81}%b"
-    local format2="|"
-  	local format3="|%F{118}%a%f"
-
-    if [ "$oh_my_git_info[behind]" -ne "0" ]; then
-    	format1="$format1%{↓%G%}$oh_my_git_info[behind]"		# commits behind
-    fi
-    if [ "$oh_my_git_info[ahead]" -ne "0" ]; then
-    	format1="$format1%{↑%G%}$oh_my_git_info[ahead]"		# commits ahead
-    fi
+function +vi-prompt_bira_set_message {
+  	local branch="%B%F{magenta}${hook_com[branch]}%b"
+  	local staged unstaged
+  	
+    [ $oh_my_git_info[behind] -gt 0 ] && branch+="%{↓%G%}$oh_my_git_info[behind]"	# commits behind
+    [ $oh_my_git_info[ahead]  -gt 0 ] && branch+="%{↑%G%}$oh_my_git_info[ahead]"	# commits ahead
     
-    format1+="%f"
+    branch+="%f"
 
-    if [ "$oh_my_git_info[staged]" -ne "0" ]; then
-    	format2+="%F{118}%{●%G%}$oh_my_git_info[staged]%f"			# staged
-    fi
-    if [ "$oh_my_git_info[conflicts]" -ne "0" ]; then
-    	format2+="%{$fg[red]%}%{✖%G%}$oh_my_git_info[conflicts]%f"	# conflicts
-    fi
-    if [ "$changed" -ne "0" ]; then
-    	format2+="%F{135}%{✚%G%}$changed%f"								# changed
-    fi
-    if [ "$oh_my_git_info[untracked]" -ne "0" ]; then
-    	format2+="%F{124}%{…%G%}$oh_my_git_info[untracked]%f"			# untracked
-    fi
-    if [[ "$format2" == "|" ]]; then
-    	format2+="%{$fg_bold[green]%}%{✔%G%}%f"							# clean
-    fi
+    [ $oh_my_git_info[staged] -gt 0 ] && staged="%F{118}●$oh_my_git_info[staged]%f"
 
-#	zstyle ':vcs_info:*:prompt:*' unstagedstr "${unstaged_format}"
-#	zstyle ':vcs_info:*:prompt:*' stagedstr "${staged_format}"
-	zstyle ':vcs_info:*:prompt:*' formats "<${format1}" "${format2}>"
-#	zstyle ':vcs_info:*:prompt:*' actionformats "${format1}" "${format2}" "${format3}"
+	if [ $oh_my_git_info[unstaged] -gt 0 ]; then
+		local changed=$(( $oh_my_git_info[modifications] + $oh_my_git_info[deletions] ))
+
+#		[ $oh_my_git_info[conflicts] -gt 0 ] && unstaged+="%F{red}%{✖%G%}$oh_my_git_info[conflicts]%f"
+		[ $oh_my_git_info[conflicts] -gt 0 ] && unstaged+="%F{red}✘$oh_my_git_info[conflicts]%f"
+		[ $changed                   -gt 0 ] && unstaged+="%F{135}±$changed%f"
+#		[ $oh_my_git_info[untracked] -gt 0 ] && unstaged+="%F{124}%{…%G%}$oh_my_git_info[untracked]%f"
+		[ $oh_my_git_info[untracked] -gt 0 ] && unstaged+="%F{244}?$oh_my_git_info[untracked]%f"
+	else
+		unstaged="%{$fg_bold[green]%}%{✔%G%}%f"
+	fi
+
+	hook_com[branch]=$branch
+	hook_com[staged]=$staged
+	hook_com[unstaged]=$unstaged
+
+	[ -n $hook_com[action] ] && hook_com[action]="%F{118}${oh_my_git_info[action]}%f"
 }
 
 function prompt_bira_precmd() {
-  vcs_info 'prompt'
+	vcs_info 'prompt'
 }
 
 function prompt_bira_setup() {
 	autoload -Uz add-zsh-hook vcs_info
 
 	#local return_code='%(?..%F{red}%? ↵%f)'
-	local return_code='%(?..%F{red}%? %f)'
+#	local return_code='%(?..%F{red}%? %f)'
+	local return_code='%(?..%F{red}%? ↵%f)'
 	local user_host='%F{118}%n@%m%f'
 	local current_dir='%B%F{blue}%~%f%b'
 	local prompt_symbol
 
 	case "$OSTYPE" in
-		darwin)
-			prompt_symbol=""
-			;;
-		cygwin)
-			prompt_symbol=""
-			;;
-		linux*)
-			prompt_symbol=""
-			;;
-		*)
-			prompt_symbol="$"
-			;;
+		darwin*) prompt_symbol="" ;;
+		cygwin*) prompt_symbol="" ;;
+		linux*) prompt_symbol="" ;;
+		*) prompt_symbol="•" ;;
 	esac
 
 	# Add hook for calling vcs_info before each command.
@@ -72,9 +55,11 @@ function prompt_bira_setup() {
 	# Set vcs_info parameters.
 	zstyle ':vcs_info:*' enable git
 	zstyle ':vcs_info:*:prompt:*' check-for-changes true
-	zstyle ':vcs_info:git+post-backend:prompt:*' hooks git-status
+	zstyle ':vcs_info:*:prompt:*' formats "(%b|%c%u)"
+	zstyle ':vcs_info:*:prompt:*' actionformats "(%b|%c%u|%a)"
+	zstyle ':vcs_info:git*+set-message:*' hooks prompt_bira_set_message
 
-	PROMPT="╭─${user_host}  ${current_dir}  "'${vcs_info_msg_0_}${vcs_info_msg_1_}${vcs_info_msg_2_}'"
+	PROMPT="╭─${user_host}  ${current_dir}  "'${vcs_info_msg_0_}'"
 ╰─%B${prompt_symbol}%b "
 	RPS1="${return_code}"
 }
