@@ -151,8 +151,8 @@ function oh-my-git-chpwd {
 	fi
 
 	oh_my_git_info=(
-		is_a_git_repo	"$is_a_git_repo"
-		is_disabled		"$is_disabled"
+		is_a_git_repo	$is_a_git_repo
+		is_disabled		$is_disabled
 		git_dir			"$git_dir"
 	)
 }
