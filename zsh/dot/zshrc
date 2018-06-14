@@ -28,6 +28,8 @@ umask 022
 autoload -U zsh-mime-setup
 zsh-mime-setup
 
+zstyle ':vcs_info:*:prompt:bira:*' colors prompt yellow user 244
+
 source $zdotdir/.dotfiles/zsh/dot/zplugrc.prezto
 
 path=( . ~/bin $path )

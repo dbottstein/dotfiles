@@ -1,31 +1,44 @@
 function +vi-prompt_bira_set_message {
-  	local branch="%B%F{magenta}${hook_com[branch]}%b"
-  	local staged unstaged
-  	
-    [ $oh_my_git_info[behind] -gt 0 ] && branch+="%{↓%G%}$oh_my_git_info[behind]"	# commits behind
-    [ $oh_my_git_info[ahead]  -gt 0 ] && branch+="%{↑%G%}$oh_my_git_info[ahead]"	# commits ahead
-    
-    branch+="%f"
+	local branch_color=${prompt_bira_colors[branch]:-magenta}
+	local behind_color=${prompt_bira_colors[behind]:-41}
+	local ahead_color=${prompt_bira_colors[ahead]:-47}
+	local staged_color=${prompt_bira_colors[staged]:-118}
+	local clean_color=${prompt_bira_colors[clean]:-118}
+	local changed_color=${prompt_bira_colors[changed]:-135}
+	local untracked_color=${prompt_bira_colors[untracked]:-244}
+	local conflicts_color=${prompt_bira_colors[conflicts]:-red}
+	local action_color=${prompt_bira_colors[action]:-yellow}
 
-    [ $oh_my_git_info[staged] -gt 0 ] && staged="%F{118}●$oh_my_git_info[staged]%f"
+	local behind_symbol=${prompt_bira_symbols[behind]:-"%{↓%G%}"}
+	local ahead_symbol=${prompt_bira_symbols[ahead]:-"%{↑%G%}"}
+	local staged_symbol=${prompt_bira_symbols[staged]:-"%{●%G%}"}
+	local changed_symbol=${prompt_bira_symbols[changed]:-"%{±%G%}"}
+	local untracked_symbol=${prompt_bira_symbols[untracked]:-"%{¿%G%}"}
+	local conflicts_symbol=${prompt_bira_symbols[conflicts]:-"%{✘%G%}"}
+	local clean_symbol=${prompt_bira_symbols[clean]:-"%{✓%G%}"}	# check mark
+
+  	local branch="%B%F{$branch_color}${hook_com[branch]}%f%b"
+  	local staged unstaged
+
+    [ $oh_my_git_info[behind] -gt 0 ] && branch+="%F{$behind_color}$behind_symbol$oh_my_git_info[behind]%f"
+    [ $oh_my_git_info[ahead]  -gt 0 ] && branch+="%F{$ahead_color}$ahead_symbol$oh_my_git_info[ahead]%f"
+    [ $oh_my_git_info[staged] -gt 0 ] && staged="%F{$staged_color}$staged_symbol$oh_my_git_info[staged]%f"
 
 	if [ $oh_my_git_info[unstaged] -gt 0 ]; then
 		local changed=$(( $oh_my_git_info[modifications] + $oh_my_git_info[deletions] ))
 
-#		[ $oh_my_git_info[conflicts] -gt 0 ] && unstaged+="%F{red}%{✖%G%}$oh_my_git_info[conflicts]%f"
-		[ $oh_my_git_info[conflicts] -gt 0 ] && unstaged+="%F{red}✘$oh_my_git_info[conflicts]%f"
-		[ $changed                   -gt 0 ] && unstaged+="%F{135}±$changed%f"
-#		[ $oh_my_git_info[untracked] -gt 0 ] && unstaged+="%F{124}%{…%G%}$oh_my_git_info[untracked]%f"
-		[ $oh_my_git_info[untracked] -gt 0 ] && unstaged+="%F{244}?$oh_my_git_info[untracked]%f"
+		[ $oh_my_git_info[conflicts] -gt 0 ] && unstaged+="%F{$conflicts_color}$conflicts_symbol$oh_my_git_info[conflicts]%f"
+		[ $changed                   -gt 0 ] && unstaged+="%F{$changed_color}$changed_symbol$changed%f"
+		[ $oh_my_git_info[untracked] -gt 0 ] && unstaged+="%F{$untracked_color}$untracked_symbol$oh_my_git_info[untracked]%f"
 	else
-		unstaged="%{$fg_bold[green]%}%{✔%G%}%f"
+		unstaged="%F{$clean_color}$clean_symbol%f"
 	fi
 
 	hook_com[branch]=$branch
 	hook_com[staged]=$staged
 	hook_com[unstaged]=$unstaged
 
-	[ -n $hook_com[action] ] && hook_com[action]="%F{118}${oh_my_git_info[action]}%f"
+	[ -n "$hook_com[action]" ] && hook_com[action]="%B%F{$action_color}${oh_my_git_info[action]}%f%b"
 }
 
 function prompt_bira_precmd() {
@@ -34,22 +47,35 @@ function prompt_bira_precmd() {
 
 function prompt_bira_setup() {
 	autoload -Uz add-zsh-hook vcs_info
+	typeset -gA prompt_bira_colors prompt_bira_symbols
+
+	zstyle -a ':vcs_info:*:prompt:bira:*' symbols prompt_bira_symbols
+	zstyle -a ':vcs_info:*:prompt:bira:*' colors prompt_bira_colors
+	
+	local prompt_symbol=$prompt_bira_symbols[prompt]
+	local return_symbol=${prompt_bira_symbols[return]:-↵}
+
+	local    dir_color=${prompt_bira_colors[dir]:-blue}
+	local   user_color=${prompt_bira_colors[user]:-118}
+	local return_color=${prompt_bira_colors[return]:-red}
+	local prompt_color=${prompt_bira_colors[prompt]:-white}
 
 	#local return_code='%(?..%F{red}%? ↵%f)'
 #	local return_code='%(?..%F{red}%? %f)'
-	local return_code='%(?..%F{red}%? ↵%f)'
-	local user_host='%F{118}%n@%m%f'
-	local current_dir='%B%F{blue}%~%f%b'
-	local prompt_symbol
+	local return_code="%(?..%F{$return_color}%? ${return_symbol}%f)"
+	local user_host="%F{$user_color}%n@%m%f"
+	local current_dir="%B%F{$dir_color}%~%f%b"
 
-	case "$OSTYPE" in
-		darwin*) prompt_symbol="" ;;
-		cygwin*) prompt_symbol="" ;;
-		linux*) prompt_symbol="" ;;
-		*) prompt_symbol="•" ;;
-	esac
+	if [ -z "$prompt_symbol" ]; then
+		case "$OSTYPE" in
+			darwin*) prompt_symbol="" ;;
+			cygwin*) prompt_symbol="" ;;
+			linux*) prompt_symbol="" ;;
+			*) prompt_symbol="⦿" ;;
+		esac
+	fi
 
-	# Add hook for calling vcs_info before each command.
+	# Add hook for calling vcs_info before each prompt.
 	add-zsh-hook precmd prompt_bira_precmd
 
 	# Set vcs_info parameters.
@@ -60,7 +86,7 @@ function prompt_bira_setup() {
 	zstyle ':vcs_info:git*+set-message:*' hooks prompt_bira_set_message
 
 	PROMPT="╭─${user_host}  ${current_dir}  "'${vcs_info_msg_0_}'"
-╰─%B${prompt_symbol}%b "
+╰─%B%F{$prompt_color}${prompt_symbol}%f%b "
 	RPS1="${return_code}"
 }
 
