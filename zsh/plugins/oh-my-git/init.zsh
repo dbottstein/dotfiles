@@ -109,34 +109,6 @@ function +vi-oh-my-git-status {
 	fi
 }
 
-# based on bash __git_ps1 to read branch and current action
-function git_current_action {
-	local git_dir=$oh_my_git_info[git_dir]
-	local action
-
-	if [[ $oh_my_git_info[is_a_git_repo] == true ]]; then
-		if [ -f "$git_dir/rebase-merge/interactive" ]; then
-			action=${is_rebasing_interactively:-"REBASE-i"}
-		elif [ -d "$git_dir/rebase-merge" ]; then
-			action=${is_rebasing_merge:-"REBASE-m"}
-		elif [ -f "$git_dir/rebase-apply/rebasing" ]; then
-			action=${is_rebasing:-"REBASE"}
-		elif [ -f "$git_dir/rebase-apply/applying" ]; then
-			action=${is_applying_mailbox_patches:-"|AM"}
-		elif [ -d "$git_dir/rebase-apply" ]; then
-			action=${is_rebasing_mailbox_patches:-"AM/REBASE"}
-		elif [ -f "$git_dir/MERGE_HEAD" ]; then
-			action=${is_merging:-"MERGING"}
-		elif [ -f "$git_dir/CHERRY_PICK_HEAD" ]; then
-			action=${is_cherry_picking:-"CHERRY-PICKING"}
-		elif [ -f "$git_dir/BISECT_LOG" ]; then
-			action=${is_bisecting:-"BISECTING"}
-		fi  
-	fi
-
-	echo -n $action
-}
-
 # check git repo status when current directory changes
 function oh-my-git-chpwd {
 	local is_a_git_repo is_disabled=false

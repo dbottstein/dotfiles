@@ -60,8 +60,6 @@ function prompt_bira_setup() {
 	local return_color=${prompt_bira_colors[return]:-red}
 	local prompt_color=${prompt_bira_colors[prompt]:-white}
 
-	#local return_code='%(?..%F{red}%? ↵%f)'
-#	local return_code='%(?..%F{red}%? %f)'
 	local return_code="%(?..%F{$return_color}%? ${return_symbol}%f)"
 	local user_host="%F{$user_color}%n@%m%f"
 	local current_dir="%B%F{$dir_color}%~%f%b"
