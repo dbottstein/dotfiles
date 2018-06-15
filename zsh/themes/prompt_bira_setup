@@ -1,4 +1,12 @@
 function +vi-prompt_bira_set_message {
+	if [[ $oh_my_git_info[is_disabled] == true ]]; then
+		hook_com[branch]=""
+		hook_com[staged]=""
+		hook_com[unstaged]=""
+		hook_com[action]=""
+		return;
+	fi
+
 	local branch_color=${prompt_bira_colors[branch]:-magenta}
 	local behind_color=${prompt_bira_colors[behind]:-41}
 	local ahead_color=${prompt_bira_colors[ahead]:-47}
@@ -41,11 +49,11 @@ function +vi-prompt_bira_set_message {
 	[ -n "$hook_com[action]" ] && hook_com[action]="%B%F{$action_color}${oh_my_git_info[action]}%f%b"
 }
 
-function prompt_bira_precmd() {
+function prompt_bira_precmd {
 	vcs_info 'prompt'
 }
 
-function prompt_bira_setup() {
+function prompt_bira_setup {
 	autoload -Uz add-zsh-hook vcs_info
 	typeset -gA prompt_bira_colors prompt_bira_symbols
 

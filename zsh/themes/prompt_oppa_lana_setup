@@ -1,0 +1,181 @@
+function +vi-prompt_oppa_lana_set_message {
+	hook_com[misc]="         %F{white}%k%b%f"
+
+	if [[ $oh_my_git_info[is_disabled] == true ]]; then
+		return;
+	fi
+
+	local -A info=( "${(@fkv)oh_my_git_info}" )	# save some typing
+#
+	# foreground
+	local black='%F{black}'
+	local red='%F{red}'
+	local green='%F{green}'
+	local yellow='%F{yellow}'
+	local blue='%F{blue}'
+	local purple='%F{magenta}'
+	local cyan='%F{cyan}'
+	local white='%F{white}'
+
+	#background
+	local background_black='%K{black}'
+	local background_red='%K{red}'
+	local background_green='%K{green}'
+	local background_yellow='%K{yellow}'
+	local background_blue='%K{blue}'
+	local background_purple='%K{magenta}'
+	local background_cyan='%K{cyan}'
+	local background_white='%K{white}'
+
+	local black_on_white="${black}${background_white}"
+	local yellow_on_white="${yellow}${background_white}"
+	local red_on_white="${red}${background_white}"
+	local red_on_black="${red}${background_black}"
+	local black_on_red="${black}${background_red}"
+	local white_on_red="${white}${background_red}"
+	local yellow_on_red="${yellow}${background_red}"
+	local reset='%f%k%b'
+
+#	local omg_default_color_on="$black_on_white"
+	local prompt=""
+
+	prompt="${black_on_white} "
+	prompt+=$(enrich_append true $omg_is_a_git_repo_symbol "$black_on_white")
+	prompt+=$(enrich_append $info[stashes] $omg_has_stashes_symbol "$yellow_on_white")
+
+	prompt+=$(enrich_append $info[untracked] "$omg_has_untracked_files_symbol" "$red_on_white")
+	prompt+=$(enrich_append $info[modifications] $omg_has_modifications_symbol "$red_on_white")
+	prompt+=$(enrich_append $info[deletions] $omg_has_deletions_symbol "$red_on_white")
+	
+
+	# ready
+	prompt+=$(enrich_append $info[adds] $omg_has_adds_symbol "$black_on_white")
+	prompt+=$(enrich_append $info[modifications_cached] $omg_has_cached_modifications_symbol "$black_on_white")
+	prompt+=$(enrich_append $info[deletions_cached] $omg_has_cached_deletions_symbol "$black_on_white")
+	
+	# next operation
+
+	prompt+=$(enrich_append $info[ready_to_commit] $omg_ready_to_commit_symbol "$red_on_white")
+
+	# where
+
+	prompt="${prompt} ${white_on_red} ${black_on_red}"
+	if [[ $info[is_detached] == true ]]; then
+		prompt+=$(enrich_append $info[is_detached] "$omg_detached_symbol" "$white_on_red")
+		prompt+=$(enrich_append $info[is_detached] "($info[hash])" "$black_on_red")
+	else            
+		if [[ $info[has_upstream] == false ]]; then
+			prompt+=$(enrich_append true "-- ${omg_not_tracked_branch_symbol}  --  ($info[branch])" "$black_on_red")
+		else
+			if [[ $info[will_rebase] == true ]]; then
+				local type_of_upstream=$omg_rebase_tracking_branch_symbol
+			else
+				local type_of_upstream=$omg_merge_tracking_branch_symbol
+			fi
+
+			if [[ $info[has_diverged] == true ]]; then
+				prompt+=$(enrich_append true "-$info[behind] ${omg_has_diverged_symbol} +$info[ahead]" "$white_on_red")
+			else
+				if [[ $info[behind] -gt 0 ]]; then
+					prompt+=$(enrich_append true "-$info[behind] ${white_on_red}${omg_can_fast_forward_symbol}${black_on_red} --" "$black_on_red")
+				elif [[ $info[ahead] -gt 0 ]]; then
+					prompt+=$(enrich_append true "-- ${white_on_red}${omg_should_push_symbol}${black_on_red}  +$info[ahead]" "$black_on_red")
+				else # [[ $info[ahead] == 0 && $info[behind] == 0 ]]; then
+					prompt+=$(enrich_append true " --   -- " "$black_on_red")
+				fi
+				
+			fi
+			prompt+=$(enrich_append true "($info[branch] ${type_of_upstream} $info[upstream])" "$black_on_red")
+		fi
+	fi
+	prompt+=$(enrich_append "$info[tag]" "${omg_is_on_a_tag_symbol} $info[tag]" "$black_on_red")
+	prompt+="${omg_last_symbol_color}${reset}"
+#	prompt+="$(eval_prompt_callback_if_present)"
+#	prompt+="${omg_second_line}"
+	hook_com[misc]=$prompt
+}
+
+function prompt_oppa_lana_precmd() {
+	vcs_info 'prompt'
+}
+
+function enrich_append {
+	local flag=$1
+	local symbol=$2
+	local color=${3:-$omg_default_color_on}
+	if [[ -z "$flag" || $flag == false || $flag == 0 ]]; then symbol=' '; fi
+
+	echo -n "${color}${symbol}  "
+}
+
+function prompt_oppa_lana_setup {
+	autoload -Uz add-zsh-hook vcs_info
+	typeset -gA prompt_oppa_lana_colors prompt_oppa_lana_symbols
+
+	zstyle -a ':vcs_info:*:prompt:oppa_lana:*' symbols prompt_oppa_lana_symbols
+	zstyle -a ':vcs_info:*:prompt:oppa_lana:*' colors prompt_oppa_lana_colors
+	
+	local prompt_symbol=$prompt_oppa_lana_symbols[prompt]
+	local return_symbol=${prompt_oppa_lana_symbols[return]:-↵}
+
+	local    dir_color=${prompt_oppa_lana_colors[dir]:-21}
+	local   user_color=${prompt_oppa_lana_colors[user]:-118}
+	local return_color=${prompt_oppa_lana_colors[return]:-red}
+	local prompt_color=${prompt_oppa_lana_colors[prompt]:-white}
+
+	local return_code="%(?..%F{$return_color}%? ${return_symbol}%f)"
+	local user_host="%F{$user_color}%n@%m%f"
+	local current_dir="%F{$dir_color}%~%f"
+
+	if [ -z "$prompt_symbol" ]; then
+		case "$OSTYPE" in
+			darwin*) prompt_symbol="" ;;
+			cygwin*) prompt_symbol="" ;;
+			linux*) prompt_symbol="" ;;
+			*) prompt_symbol="⦿" ;;
+		esac
+	fi
+
+	# Add hook for calling vcs_info before each prompt.
+	add-zsh-hook precmd prompt_oppa_lana_precmd
+
+	# Set vcs_info parameters.
+	zstyle ':vcs_info:*' enable git
+	zstyle ':vcs_info:*:prompt:*' check-for-changes false	# done by oh-my-git
+	zstyle ':vcs_info:*:prompt:*' formats "%m"
+	zstyle ':vcs_info:*:prompt:*' actionformats "%m"
+	zstyle ':vcs_info:*:prompt:*' nvcsformats "         %F{white}%k%b%f"
+	zstyle ':vcs_info:git*+set-message:*' hooks prompt_oppa_lana_set_message
+
+	PROMPT="%K{white} ${current_dir}  "'${vcs_info_msg_0_}'"
+%B%F{$prompt_color}${prompt_symbol}%f%k%b "
+	RPS1="${return_code}"
+}
+
+    : ${omg_ungit_prompt:=$PS1}
+    : ${omg_second_line:=$PS1}
+
+    : ${omg_is_a_git_repo_symbol:=''}
+    : ${omg_has_untracked_files_symbol:=''}        #                ?    
+    : ${omg_has_adds_symbol:=''}
+    : ${omg_has_deletions_symbol:=''}
+    : ${omg_has_cached_deletions_symbol:=''}
+    : ${omg_has_modifications_symbol:=''}
+    : ${omg_has_cached_modifications_symbol:=''}
+    : ${omg_ready_to_commit_symbol:=''}            #   →
+    : ${omg_is_on_a_tag_symbol:=''}                #   
+    : ${omg_needs_to_merge_symbol:='ᄉ'}
+    : ${omg_detached_symbol:=''}
+    : ${omg_can_fast_forward_symbol:=''}
+    : ${omg_has_diverged_symbol:=''}               #   
+    : ${omg_not_tracked_branch_symbol:=''}
+    : ${omg_rebase_tracking_branch_symbol:=''}     #   
+    : ${omg_merge_tracking_branch_symbol:=''}      #  
+    : ${omg_should_push_symbol:=''}                #    
+    : ${omg_has_stashes_symbol:=''}
+
+#    : ${omg_default_color_on:='\[\033[1;37m\]'}
+#    : ${omg_default_color_off:='\[\033[0m\]'}
+    : ${omg_last_symbol_color:='%F{red}%k'}	# '\e[0;31m\e[40m'}
+
+prompt_oppa_lana_setup "$@"

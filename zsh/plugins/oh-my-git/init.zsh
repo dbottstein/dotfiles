@@ -39,6 +39,7 @@ function +vi-oh-my-git-status {
 
 			local has_diverged=false
 			local can_fast_forward=false
+			local should_push=false
 			local stashes=0
 
 			if [[ $has_upstream == true ]]; then
@@ -50,6 +51,7 @@ function +vi-oh-my-git-status {
 
 				if [[ $commits_ahead -gt 0 && $commits_behind -gt 0 ]] && has_diverged=true
 				if [[ $commits_ahead -eq 0 && $commits_behind -gt 0 ]] && can_fast_forward=true
+				if [[ $has_diverged == false && $commits_ahead -gt 0 ]]; then should_push=true; fi
 
 				if [ -f "$git_dir/rebase-merge/interactive" ]; then
 					action=${is_rebasing_interactively:-"REBASE-i"}
@@ -78,12 +80,12 @@ function +vi-oh-my-git-status {
 		oh_my_git_info=(
 			is_a_git_repo			$oh_my_git_info[is_a_git_repo]
 			is_disabled				$oh_my_git_info[is_disabled]
-			git_dir					"$oh_my_git_info[git_dir]"
+			git_dir					$oh_my_git_info[git_dir]
 
 			branch					"$current_branch"
 			upstream				"${upstream//\/$current_branch/}"
 			hash					"${current_commit_hash:0:7}"
-			tag						"$tag_at_current_commit"
+			tag						"${tag_at_current_commit}"
 
 			stashes					"$stashes"
 			untracked				"$untracked"
@@ -97,14 +99,15 @@ function +vi-oh-my-git-status {
 			conflicts				"$conflicts"
 			behind					"$commits_behind"
 			ahead					"$commits_ahead"
-			action					"$action"
+			action					"${action}"
 
-			is_detached				"$detached"
-			ready_to_commit			"$ready_to_commit"
-			has_upstream			"$has_upstream"
-			has_diverged			"$has_diverged"
-			can_fast_forward		"$can_fast_forward"
-			will_rebase				"$will_rebase"
+			is_detached				$detached
+			ready_to_commit			$ready_to_commit
+			has_upstream			$has_upstream
+			has_diverged			$has_diverged
+			should_push				$should_push
+			can_fast_forward		$can_fast_forward
+			will_rebase				${will_rebase:-false}
 		);
 	fi
 }
