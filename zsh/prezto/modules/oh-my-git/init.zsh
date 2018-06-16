@@ -2,19 +2,19 @@
 # 	arialdomartini (https://github.com/arialdomartini/oh-my-git)
 # 	bric3 (https://github.com/bric3/oh-my-zsh-git)
 #
-# Here we just gather the information and add to the oh_my_git_info associative array.
+# Here we just gather the information and add to the omg associative array.
 # Presentation is left to themes to implement.
 #
 function +vi-oh-my-git-status {
 	# Early return if not git repo or is disabled
-	[[ $oh_my_git_info[is_a_git_repo] == false || $oh_my_git_info[enabled] == false ]] && return
+	[[ $omg[is_a_git_repo] == false || $omg[enabled] == false ]] && return
 
 	local current_commit_hash=$(git rev-parse HEAD 2> /dev/null)
 	local      current_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
 	local            upstream=$(git rev-parse --symbolic-full-name --abbrev-ref @{upstream} 2> /dev/null)
 	local      number_of_logs=$(git log --pretty=oneline -n1 2> /dev/null | wc -l | tr -d ' ')
 	local          git_status=$(git status --porcelain 2> /dev/null)
-	
+
 	local        modifications=$(grep -c '^.M' <<< "$git_status")
 	local modifications_cached=$(grep -c '^M' <<< "$git_status")
 	local            deletions=$(grep -c '^.D' <<< "$git_status")
@@ -25,8 +25,12 @@ function +vi-oh-my-git-status {
 
 	local unstaged=$(( modifications + deletions + untracked ))
 	local   staged=$(( adds + modifications_cached + deletions_cached ))
+    local  stashes=0
+
+    local has_diverged=false can_fast_forward=false should_push=false
 	local detached=false has_upstream=false ready_to_commit=false
 
+    [[ -f $omg[git_dir]/refs/stash ]] && stashes=$(wc -l $omg[git_dir]/refs/stash 2> /dev/null | tr -d ' ')
 	[[ $current_branch == 'HEAD' ]] && detached=true
 	[[ -n "${upstream}" && "${upstream}" != "@{upstream}" ]] && has_upstream=true
 	[[ $staged -gt 0 && $unstaged -eq 0 ]] && ready_to_commit=true
@@ -37,17 +41,12 @@ function +vi-oh-my-git-status {
 		local tag_at_current_commit=$(git describe --exact-match --tags $current_commit_hash 2> /dev/null)
 		local           will_rebase=$(git config --get branch.${current_branch}.rebase 2> /dev/null)
 
-		local has_diverged=false
-		local can_fast_forward=false
-		local should_push=false
-		local stashes=0
-
 		if [[ $has_upstream == true ]]; then
 			local commits_diff=$(git log --pretty=oneline --topo-order --left-right ${current_commit_hash}...${upstream} 2> /dev/null)
 			local action
 
-			local commits_ahead=$(grep -c "^<" <<< "$commits_diff");
-			local commits_behind=$(grep -c "^>" <<< "$commits_diff");
+			local commits_ahead=$(grep -c '^<' <<< "$commits_diff");
+			local commits_behind=$(grep -c '^>' <<< "$commits_diff");
 
 			[[ $commits_ahead -gt 0 && $commits_behind -gt 0 ]] && has_diverged=true
 			[[ $commits_ahead -eq 0 && $commits_behind -gt 0 ]] && can_fast_forward=true
@@ -69,18 +68,14 @@ function +vi-oh-my-git-status {
 				action=${is_cherry_picking:-"CHERRY-PICKING"}
 			elif [ -f "$git_dir/BISECT_LOG" ]; then
 				action=${is_bisecting:-"BISECTING"}
-			fi  
-		fi
-
-		if [[ -f $oh_my_git_info[git_dir]/refs/stash ]]; then
-			stashes=$(wc -l 2> /dev/null < $oh_my_git_info[git_dir]/refs/stash | tr -d ' ')
+			fi
 		fi
 	fi
 
-	oh_my_git_info=(
-		is_a_git_repo			$oh_my_git_info[is_a_git_repo]
-		enabled					$oh_my_git_info[enabled]
-		git_dir					$oh_my_git_info[git_dir]
+	omg=(
+		is_a_git_repo			$omg[is_a_git_repo]
+		enabled					$omg[enabled]
+		git_dir					$omg[git_dir]
 
 		branch					"$current_branch"
 		upstream				"${upstream//\/$current_branch/}"
@@ -121,18 +116,20 @@ function oh-my-git-chpwd {
 		[[ "$(git config --get oh-my-git.enabled)" == false ]] && enabled=false
 	fi
 
-	oh_my_git_info=(
+	omg=(
 		is_a_git_repo	$is_a_git_repo
 		enabled			$enabled
 		git_dir			"$git_dir"
 	)
 }
 
-autoload -Uz add-zsh-hook
-typeset -gA oh_my_git_info
+autoload -Uz add-zsh-hook vcs_info
+typeset -gA omg     # holds all oh-my-git info
 
 add-zsh-hook chpwd oh-my-git-chpwd
 oh-my-git-chpwd		# initial call on load
+
+zstyle ':vcs_info:git*:prompt:*' check-for-changes false    # handled by us
 
 # register vcs hook to gather the git information
 zstyle ':vcs_info:git*+post-backend:prompt:*' hooks oh-my-git-status
