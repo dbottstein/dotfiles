@@ -36,7 +36,7 @@ setopt                       \
      NO_glob_assign          \
         glob_complete        \
      NO_glob_dots            \
-        glob_subst           \
+     NO_glob_subst           \
      NO_global_export        \
         hash_cmds            \
         hash_dirs            \

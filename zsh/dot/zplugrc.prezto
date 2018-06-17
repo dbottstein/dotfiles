@@ -1,5 +1,8 @@
 zsh=$zdotdir/.dotfiles/zsh
 
+fpath+=( $zsh/themes )
+
+#	oh-my-git
 typeset -Ua prezto_modules=(
 	environment
 	terminal
@@ -10,7 +13,6 @@ typeset -Ua prezto_modules=(
 	python
 	rsync
 	git
-	oh-my-git
 	prompt
 	completion
 	syntax-highlighting
@@ -38,9 +40,9 @@ zplug "sorin-ionescu/prezto", \
 
 zstyle ':prezto:*:*' color 'yes'
 zstyle ':prezto:module:prompt' theme "${theme:-oppa_lana_style}"
-zstyle ':prezto:module:editor' key-bindings 'vi'
+zstyle ':prezto:module:editor' key-bindings 'emacs'
 zstyle ':prezto:module:editor' dot-expansion 'yes'
-#zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'
+#zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'	# glitch with multi-line prompt
 zstyle ':prezto:load' pmodule-dirs $zsh/prezto/modules
 zstyle ':prezto:load' pmodule $prezto_modules
 
@@ -58,6 +60,8 @@ done
 
 # Custom zsh configuration
 zplug "$zsh/lib", from:local
+
+zplug "$zsh/bin", from:local, as:command, use:"*"
 
 zplug check || zplug install
 zplug load

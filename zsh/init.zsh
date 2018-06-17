@@ -6,7 +6,7 @@ zsh-mime-setup
 
 if [ -z "$prompt_symbol" ]; then
     case "$OSTYPE" in
-        darwin*) prompt_symbol="" ;;
+        darwin*) prompt_symbol="" ;;   # 
         cygwin*) prompt_symbol="" ;;
         linux*) prompt_symbol="" ;;
         *) prompt_symbol="⦿" ;;
@@ -18,10 +18,10 @@ fi
 #echo -e "\033]6;1;bg;blue;brightness;33\a"
 
 zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:*:prompt:*:bira' colors prompt yellow user 244
+zstyle ':prezto:module:prompt:*' colors prompt yellow user 244
 #zstyle ':vcs_info:*:prompt:*:*' symbols return ""
 
-zstyle -t ':vcs_info:*:prompt:*:*' symbols prompt || zstyle ':vcs_info:*:prompt:*:*' symbols prompt "$prompt_symbol"
+zstyle -t ':prezto:module:prompt:*' symbols prompt || zstyle ':prezto:module:prompt:*' symbols prompt "$prompt_symbol"
 
 zstyle ':vcs_info:*:prompt:*:oppa_lana_style' formats \
             "%F{244}%K{239} %n@%m %F{239}%K{57}%F{white} %~ %F{57}%k"$'\n'" %F{yellow}%k${prompt_symbol} %f%k%b" \

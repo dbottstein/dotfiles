@@ -48,6 +48,7 @@ case $OSTYPE in
         alias -- acroread="open -a Adobe\ Acrobat\ Reader\ DC"
         alias -- mark='open -a MacDown'
         alias -- preview='open -a Preview'
+        alias -- edit='open -a BBEdit'
 
         if [[ -x "${commands[gls]}" ]]; then
             alias -- gls='gls -F --color=auto'
