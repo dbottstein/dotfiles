@@ -141,7 +141,7 @@ function git-info-extended {
   return 0
 }
 
-function prompt_oppa_lana_async_git {
+function prompt_oppa_lana_style_async_git {
   cd -q "$1"
   if (( $+functions[git-info] )); then
     git-info-extended
@@ -149,108 +149,77 @@ function prompt_oppa_lana_async_git {
   fi
 }
 
-function prompt_oppa_lana_async_tasks {
+function prompt_oppa_lana_style_async_tasks {
   # Initialize async worker. This needs to be done here and not in
-  # prompt_oppa_lana_setup so the git formatting can be overridden by other prompts.
-  if (( !${prompt_prezto_oppa_lana_async_init:-0} )); then
-    async_start_worker prompt_oppa_lana -n
-    async_register_callback prompt_oppa_lana prompt_oppa_lana_async_callback
-    typeset -g prompt_prezto_async_init=1
+  # prompt_oppa_lana_style_setup so the git formatting can be overridden by other prompts.
+  if (( !${prompt_oppa_lana_style_async_init:-0} )); then
+    async_start_worker prompt_oppa_lana_style -n
+    async_register_callback prompt_oppa_lana_style prompt_oppa_lana_style_async_callback
+    typeset -g prompt_oppa_lana_style_async_init=1
   fi
 
   # Kill the old process of slow commands if it is still running.
-  async_flush_jobs prompt_oppa_lana
+  async_flush_jobs prompt_oppa_lana_style
 
   # Compute slow commands in the background.
-  async_job prompt_oppa_lana prompt_oppa_lana_async_git "$PWD"
+  async_job prompt_oppa_lana_style prompt_oppa_lana_style_async_git "$PWD"
 }
 
-function prompt_oppa_lana_precmd {
+function prompt_oppa_lana_style_precmd {
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
 
   # Format PWD.
-  _prompt_oppa_lana_pwd=$(prompt-pwd)
-
-  # Handle updating git data. We also clear the git prompt data if we're in a
-  # different git root now.
-  if (( $+functions[git-dir] )); then
-    local new_git_root="$(git-dir 2> /dev/null)"
-    if [[ $new_git_root != $_oppa_lana_cur_git_root ]]; then
-      _prompt_oppa_lana_git=''
-      _oppa_lana_cur_git_root=$new_git_root
-    fi
-  fi
+  _prompt_oppa_lana_style_pwd=$(prompt-pwd)
 
   # Run python info (this should be fast and not require any async)
   if (( $+functions[python-info] )); then
     python-info
   fi
 
-  prompt_oppa_lana_async_tasks
+  # Handle updating git data. We also clear the git prompt data if we're in a
+  # different git root now.
+  if (( $+functions[git-dir] )); then
+    local new_git_root="$(git-dir 2> /dev/null)"
+    if [[ $new_git_root != $_oppa_lana_style_cur_git_root ]]; then
+      _prompt_oppa_lana_style_git=''
+      _prompt_oppa_lana_style_no_git=''
+      _oppa_lana_style_cur_git_root=$new_git_root
+    fi
+    if [[ -z "$new_git_root" ]]; then
+      local format
+      zformat -f format $prompt_oppa_lana_style_style_formats[no-git] "~:$_prompt_oppa_lana_style_pwd"
+      _prompt_oppa_lana_style_no_git=format
+      return
+    fi
+  fi
+
+  prompt_oppa_lana_style_async_tasks
 }
 
-function prompt_oppa_lana_setup {
+function prompt_oppa_lana_style_setup {
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
   prompt_opts=(cr percent sp subst)
-  _prompt_oppa_lana_precmd_async_pid=0
-  _prompt_oppa_lana_precmd_async_data=$(mktemp "${TMPDIR:-/tmp}/oppa_lana-prompt-async-XXXXXXXXXX")
+  _prompt_oppa_lana_style_precmd_async_pid=0
+  _prompt_oppa_lana_style_precmd_async_data=$(mktemp "${TMPDIR:-/tmp}/oppa_lana_style-prompt-async-XXXXXXXXXX")
 
   # Load required functions.
   autoload -Uz add-zsh-hook
   autoload -Uz async && async
 
   # Add hook for calling git-info before each command.
-  add-zsh-hook precmd prompt_oppa_lana_precmd
-
-  typeset -gA prompt_oppa_lana_style_symbols
-  local -A symbols colors formats
-
-  zstyle -a ':prezto:module:prompt:oppa_lana_style' symbols symbols
-  zstyle -a ':prezto:module:prompt:oppa_lana_style' colors colors
-  zstyle -a ':prezto:module:prompt:oppa_lana_style' formats formats
-
-  # fill in defaults
-  prompt_oppa_lana_style_symbols=(
-    is_a_git_repo 			 ${symbols[is_a_git_rep]:-''}
-    has_untracked_files 	 ${symbols[has_untracked_files]:-''}		#                ?    
-    has_adds 				 ${symbols[has_adds]:-''}
-    has_deletions 			 ${symbols[has_deletions]:-''}
-    has_cached_deletions 	 ${symbols[has_cached_deletions]:-''}
-    has_modifications 		 ${symbols[has_modifications]:-''}
-    has_cached_modifications ${symbols[has_cached_modifications]:-''}
-    ready_to_commit 		 ${symbols[ready_to_commit]:-''}			#   →
-    is_on_a_tag 			 ${symbols[is_on_a_tag]:-''}				#   
-    needs_to_merge 			 ${symbols[needs_to_merge]:-'ᄉ'}
-    detached 				 ${symbols[detached]:-''}
-    can_fast_forward 		 ${symbols[can_fast_forward]:-''}
-    has_diverged 			 ${symbols[has_diverged]:-''}				#   
-    not_tracked_branch 		 ${symbols[not_tracked_branch]:-''}
-    rebase_tracking_branch 	 ${symbols[rebase_tracking_branch]:-''}	#   
-    merge_tracking_branch 	 ${symbols[merge_tracking_branch]:-''}		# 
-    should_push 			 ${symbols[should_push]:-''}				#   
-    has_stashes 			 ${symbols[has_stashes]:-''}
-  )
-
-  local black_on_white="%F{black}%K{white}"
-  local yellow_on_white="%F{yellow}%K{white}"
-  local red_on_white="%F{red}%K{white}"
-  local black_on_red="%F{black}%K{red}"
-  local white_on_red="%F{white}%K{red}"
-  local yellow_on_red="%F{yellow}%K{red}"
-  local reset='%f%k%b'
-
-  local prompt_symbol=${symbols[prompt]:-'%#'}
-  local prompt_color=${colors[prompt]:-white}
-  local prmpt="%(!. %B%F{1}${prompt_symbol}%f%b.%B%F{$prompt_color}${prompt_symbol}%f%b)"
+  add-zsh-hook precmd prompt_oppa_lana_style_precmd
 
   # Set editor-info parameters.
-#  zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'
+#   zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'
   zstyle ':prezto:module:editor:info:keymap:primary' format ' %B%F{1}❯%F{3}❯%F{2}❯%f%b'
   zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format ' %F{3}♺%f'
   zstyle ':prezto:module:editor:info:keymap:alternate' format ' %B%F{2}❮%F{3}❮%F{1}❮%f%b'
   zstyle ':prezto:module:prompt' pwd-length 'short'
+
+  # Set python-info format
+  zstyle ':prezto:module:python:info:virtualenv' format '%f%F{3}(%v)%F{7} '
 
   # Set git-info parameters.
   zstyle ':prezto:module:git:info' verbose 'no' # detailed info is collected by us
@@ -262,6 +231,7 @@ function prompt_oppa_lana_setup {
   zstyle ':prezto:module:git:info:commit'    format '%.7c'
   zstyle ':prezto:module:git:info:deleted'   format '%d'
   zstyle ':prezto:module:git:info:deletedX'  format '%X'
+  zstyle ':prezto:module:git:info:renamed'   format '%r'
   zstyle ':prezto:module:git:info:modified'  format '%m'
   zstyle ':prezto:module:git:info:modifiedX' format '%M'
   zstyle ':prezto:module:git:info:position'  format '%p'
@@ -271,7 +241,54 @@ function prompt_oppa_lana_setup {
   zstyle ':prezto:module:git:info:clean'     format 'true'
   zstyle ':prezto:module:git:info:remote'    format '%R'
 #  zstyle ':prezto:module:git:info:keys'      format 'status' '%b %p %c:%b:%S:%u:%m:%d:%a:%U:%c:%R:%A:%B:%p:%s:%C'
-  zstyle ':prezto:module:git:info:keys-ext'  format 'status' '%b %p %c:%b:0%S:0%u:0%m:0%M:0%d:0%X:0%a:0%U:%c:%R:0%A:0%B:%p:%s:%C'
+  zstyle ':prezto:module:git:info:keys-ext'  format 'status' '%b %p %c:%b:0%S:0%u:0%m:0%M:0%d:0%X:0%a:0%r:0%U:%c:%R:0%A:0%B:%p:%s:%C'
+
+
+  typeset -gA prompt_oppa_lana_style_style_symbols prompt_oppa_lana_style_style_colors prompt_oppa_lana_style_style_formats
+  local -A symbols colors formats
+
+  local reset='%f%k%b'
+
+  zstyle -a ':prezto:module:prompt:oppa-lana-style' symbols symbols
+  zstyle -a ':prezto:module:prompt:oppa-lana-style' colors colors
+  zstyle -a ':prezto:module:prompt:oppa-lana-style' prompt-formats formats
+
+  # fill in defaults
+  prompt_oppa_lana_style_style_symbols=(
+    is_a_git_repo 			  ${symbols[is_a_git_rep]:-''}
+    has_untracked_files 	  ${symbols[has_untracked_files]:-''}		#                ?    
+    has_adds 				  ${symbols[has_adds]:-''}
+    has_deletions 			  ${symbols[has_deletions]:-''}
+    has_renames 			  ${symbols[has_renames]:-'➜'}
+    has_cached_deletions 	  ${symbols[has_cached_deletions]:-''}
+    has_modifications 		  ${symbols[has_modifications]:-''}
+    has_cached_modifications  ${symbols[has_cached_modifications]:-''}
+    ready_to_commit 		  ${symbols[ready_to_commit]:-''}			#   →
+    is_on_a_tag 			  ${symbols[is_on_a_tag]:-''}				#   
+    needs_to_merge 			  ${symbols[needs_to_merge]:-'ᄉ'}
+    detached 				  ${symbols[detached]:-''}
+    can_fast_forward 		  ${symbols[can_fast_forward]:-''}
+    has_diverged 			  ${symbols[has_diverged]:-''}				#   
+    not_tracked_branch 		  ${symbols[not_tracked_branch]:-''}
+    rebase_tracking_branch 	  ${symbols[rebase_tracking_branch]:-''}	#   
+    merge_tracking_branch 	  ${symbols[merge_tracking_branch]:-''}		# 
+    should_push 			  ${symbols[should_push]:-''}				#   
+    has_stashes 			  ${symbols[has_stashes]:-''}
+  )
+
+  prompt_oppa_lana_style_style_formats=(
+    user            "${formats[user]:-${SSH_TTY:+'%F{9}%n%f%F{7}@%f%F{3}%m%f  '}}"
+    directory       ''
+    no-git          "${formats[no-git]:- %F{blue\}%k%b%~%f}"
+#    prompt          ${formats[symbol]:-$'\n'%B${colors[prompt_background]:+%K{$colors[prompt_background]}}%(!.%F{1}.%F{${colors[prompt_foreground]:-white}})${symbols[prompt]:-'%#'}${reset}}
+  )
+
+
+  # Get the async worker set up
+  _oppa_lana_style_cur_git_root=''
+  _prompt_oppa_lana_style_git=''
+  _prompt_oppa_lana_style_no_git=''
+  _prompt_oppa_lana_style_pwd=''
 
   # Default is to show the return value
   if zstyle -T ':prezto:module:prompt' show-return-val; then
@@ -280,31 +297,42 @@ function prompt_oppa_lana_setup {
     local show_return="✘ "
   fi
 
-  # Set python-info format
-  zstyle ':prezto:module:python:info:virtualenv' format '%f%F{3}(%v)%F{7} '
+  if zstyle -T ':prezto:module:prompt' show-directory; then
+    local _fg=$(_color "${colors[directory_foreground]:-white}" f) _bg=$(_color "${colors[directory_background]:-blue}" k)
+    local _fg2=$(_color "${colors[directory_background]:-blue}" f)
 
-  # Get the async worker set up
-  _oppa_lana_cur_git_root=''
+    prompt_oppa_lana_style_style_formats[directory]="${_fg}${_bg} %~ ${_fg2::=${_fg2//\[48;/[38;}}%K{white}"
+  fi
 
-  _prompt_oppa_lana_git=''
-  _prompt_oppa_lana_pwd=''
-  local _prompt_oppa_lana_user="${SSH_TTY:+'%F{9}%n%f%F{7}@%f%F{3}%m%f  '}"
+  local prompt_symbol=${formats[symbol]:-$'\n'%B${colors[prompt_background]:+%K{$colors[prompt_background]}}%(!.%F{1}.%F{${colors[prompt_foreground]:-white}})${symbols[prompt]:-'%#'}${reset} }
+#   local is_newline=false
+#   [[ "${prompt_symbol:0:1}" == $'\n' ]] && is_newline=true
 
   # Define prompts.
-  PROMPT=' %F{239}%K{57}%F{white}${_prompt_oppa_lana_pwd} %F{57}%K{white}${_prompt_oppa_lana_git}%f%k%b'$'\n'" ${prmpt}"'${editor_info[keymap]} '
-  RPROMPT='$python_info[virtualenv]${editor_info[overwrite]}%(?:: %F{1}'
+  PROMPT='${_prompt_oppa_lana_style_no_git}${_prompt_oppa_lana_style_git}'
+  PROMPT+=${prompt_symbol}
+#   PROMPT+='${editor_info[keymap]} '
+
+  RPROMPT='$python_info[virtualenv]${editor_info[overwrite]}  '
+#  RPROMPT+=${user}
+  RPROMPT+='%(?:: %F{1}'
   RPROMPT+=${show_return}
   RPROMPT+='%f)'
+
   SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
 }
 
-function prompt_oppa_lana_preview {
+function _color {
+    if [[ ${1:0:1} == $'\e' ]]; then echo %{$1%}; else echo ${2:+%${(U)2}{$1}}; fi
+}
+
+function prompt_oppa_lana_style_preview {
   local +h PROMPT=''
   local +h RPROMPT=''
   local +h SPROMPT=''
 
   editor-info 2> /dev/null
-  prompt_preview_theme 'oppa_lana'
+  prompt_preview_theme 'oppa_lana_style'
 }
 
 function enrich_append {
@@ -316,8 +344,8 @@ function enrich_append {
   echo -n "${color}${symbol}  "
 }
 
-function prompt_oppa_lana_build_prompt {
-  typeset -A symbols=( "${(@fkv)prompt_oppa_lana_style_symbols}" )
+function prompt_oppa_lana_style_build_git_prompt {
+  typeset -A symbols=( "${(@fkv)prompt_oppa_lana_style_style_symbols}" )
 
   local black_on_white="%F{black}%K{white}"
   local yellow_on_white="%F{yellow}%K{white}"
@@ -343,7 +371,10 @@ function prompt_oppa_lana_build_prompt {
 
   (( staged > 0 && unstaged == 0 )) && omg[ready_to_commit]=true
 
-  local prompt="${black_on_white}  "
+  local dir
+  zformat -f dir $prompt_oppa_lana_style_style_formats[directory] "~:$_prompt_oppa_lana_style_pwd"
+
+  local prompt="${dir} ${black_on_white}  "
 
   # on filesystem (unstaged)
 
@@ -359,6 +390,7 @@ function prompt_oppa_lana_build_prompt {
   prompt+=$(enrich_append $omg[adds] "$symbols[has_adds]" "$black_on_white")
   prompt+=$(enrich_append $omg[modifications_cached] "$symbols[has_cached_modifications]" "$black_on_white")
   prompt+=$(enrich_append $omg[deletions_cached] "$symbols[has_cached_deletions]" "$black_on_white")
+  prompt+=$(enrich_append $omg[renames] "$symbols[has_renames]" "$black_on_white")
 
   # next operation
 
@@ -403,16 +435,16 @@ function prompt_oppa_lana_build_prompt {
 
   prompt+=$(enrich_append "$omg[tag]" "$symbols[is_on_a_tag] $omg[tag]" "$black_on_red")
   prompt+="%F{red}%k$reset"
-#	prompt+="${prompt_oppa_lana_style_formats[suffix]}"
+#	prompt+="${prompt_oppa_lana_style_style_formats[suffix]}"
 #	prompt+="$(eval_prompt_callback_if_present)"
 #	prompt+="${omg_second_line}"
 
   print -n "$prompt"
 }
 
-function prompt_oppa_lana_async_callback {
+function prompt_oppa_lana_style_async_callback {
   case $1 in
-    prompt_oppa_lana_async_git)
+    prompt_oppa_lana_style_async_git)
       unset omg
       typeset -gA omg
       local -a info
@@ -430,10 +462,9 @@ function prompt_oppa_lana_async_callback {
 
       if [[ -z "$_git_target" ]]; then
         # No git target detected, flush the git fragment and redisplay the prompt.
-        if [[ -n "$_prompt_oppa_lana_git" ]]; then
-          _prompt_oppa_lana_git=''
-          zle && zle reset-prompt
-        fi
+        _prompt_oppa_lana_style_git=''
+        _prompt_oppa_lana_style_no_git=$prompt_oppa_lana_style_style_formats[no-git]
+        zle && zle reset-prompt
       else
         # Git target detected, update the git fragment and redisplay the prompt.
 
@@ -446,23 +477,24 @@ function prompt_oppa_lana_async_callback {
             deletions               $info[6]
             deletions_cached        $info[7]
             adds                    $info[8]
-            unmerged                $info[9]
-            hash                   "$info[10]"
-            remote                 "$info[11]"
-            ahead                   $info[12]
-            behind                  $info[13]
-            position               "$info[14]"
-            action                 "$info[15]"
-            clean                  "$info[16]"
+            renames                 $info[9]
+            unmerged                $info[10]
+            hash                   "$info[11]"
+            remote                 "$info[12]"
+            ahead                   $info[13]
+            behind                  $info[14]
+            position               "$info[15]"
+            action                 "$info[16]"
+            clean                  "$info[17]"
         )
 
 #         echo "${(@fkv)omg}"
 
-        _prompt_oppa_lana_git="$(prompt_oppa_lana_build_prompt)"
+        _prompt_oppa_lana_style_git="$(prompt_oppa_lana_style_build_git_prompt)"
         zle && zle reset-prompt
       fi
       ;;
   esac
 }
 
-prompt_oppa_lana_setup "$@"
+prompt_oppa_lana_style_setup "$@"

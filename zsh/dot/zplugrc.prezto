@@ -2,7 +2,6 @@ zsh=$zdotdir/.dotfiles/zsh
 
 fpath+=( $zsh/themes )
 
-#	oh-my-git
 typeset -Ua prezto_modules=(
 	environment
 	terminal
