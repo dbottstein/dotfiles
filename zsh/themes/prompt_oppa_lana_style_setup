@@ -416,12 +416,12 @@ function prompt_oppa_lana_style_build_git_prompt {
       fi
 
       if [[ $omg[has_diverged] == true ]]; then
-        prompt+=$(enrich_append true "-$omg[behind] $symbols[has_diverged] +$omg[ahead]" "$white_on_red")
+        prompt+=$(enrich_append true "-${omg[behind]#0} $symbols[has_diverged] +${omg[ahead]#0}" "$white_on_red")
       else
         if [[ $omg[behind] -gt 0 ]]; then
-          prompt+=$(enrich_append true "-$omg[behind] ${white_on_red}${symbols[can_fast_forward]}${black_on_red} --" "$black_on_red")
+          prompt+=$(enrich_append true "-${omg[behind]#0} ${white_on_red}${symbols[can_fast_forward]}${black_on_red} --" "$black_on_red")
         elif [[ $omg[ahead] -gt 0 ]]; then
-          prompt+=$(enrich_append true "-- ${white_on_red}${symbols[should_push]}${black_on_red}  +$omg[ahead]" "$black_on_red")
+          prompt+=$(enrich_append true "-- ${white_on_red}${symbols[should_push]}${black_on_red}  +${omg[ahead]#0}" "$black_on_red")
         else # [[ $omg[ahead] == 0 && $omg[behind] == 0 ]]; then
           prompt+=$(enrich_append true " --   -- " "$black_on_red")
         fi
