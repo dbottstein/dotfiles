@@ -7,9 +7,8 @@ pmodload 'helper'
 
 # Gets the Git status information.
 function git-info-extended {
-  # Extended globbing is needed to parse repository status.
   setopt LOCAL_OPTIONS
-  setopt EXTENDED_GLOB
+  setopt EXTENDED_GLOB  # Extended globbing is needed to parse repository status.
 
   local added=0
   local added_format
@@ -188,7 +187,7 @@ function prompt_oppa_lana_style_precmd {
     fi
     if [[ -z "$new_git_root" ]]; then
       local format
-      zformat -f format $prompt_oppa_lana_style_style_formats[no-git] "~:$_prompt_oppa_lana_style_pwd"
+      zformat -f format $prompt_oppa_lana_style_formats[no-git] "~:$_prompt_oppa_lana_style_pwd"
       _prompt_oppa_lana_style_no_git=format
       return
     fi
@@ -244,7 +243,7 @@ function prompt_oppa_lana_style_setup {
   zstyle ':prezto:module:git:info:keys-ext'  format 'status' '%b %p %c:%b:0%S:0%u:0%m:0%M:0%d:0%X:0%a:0%r:0%U:%c:%R:0%A:0%B:%p:%s:%C'
 
 
-  typeset -gA prompt_oppa_lana_style_style_symbols prompt_oppa_lana_style_style_colors prompt_oppa_lana_style_style_formats
+  typeset -gA prompt_oppa_lana_style_symbols prompt_oppa_lana_style_colors prompt_oppa_lana_style_formats
   local -A symbols colors formats
 
   local reset='%f%k%b'
@@ -254,7 +253,7 @@ function prompt_oppa_lana_style_setup {
   zstyle -a ':prezto:module:prompt:oppa-lana-style' prompt-formats formats
 
   # fill in defaults
-  prompt_oppa_lana_style_style_symbols=(
+  prompt_oppa_lana_style_symbols=(
     is_a_git_repo 			  ${symbols[is_a_git_rep]:-''}
     has_untracked_files 	  ${symbols[has_untracked_files]:-''}		#                ?    
     has_adds 				  ${symbols[has_adds]:-''}
@@ -276,11 +275,10 @@ function prompt_oppa_lana_style_setup {
     has_stashes 			  ${symbols[has_stashes]:-''}
   )
 
-  prompt_oppa_lana_style_style_formats=(
+  prompt_oppa_lana_style_formats=(
     user            "${formats[user]:-${SSH_TTY:+'%F{9}%n%f%F{7}@%f%F{3}%m%f  '}}"
     directory       ''
-    no-git          "${formats[no-git]:- %F{blue\}%k%b%~%f}"
-#    prompt          ${formats[symbol]:-$'\n'%B${colors[prompt_background]:+%K{$colors[prompt_background]}}%(!.%F{1}.%F{${colors[prompt_foreground]:-white}})${symbols[prompt]:-'%#'}${reset}}
+    no-git          "${formats[no-git]:-%F{white\}%K{blue\} %~ %F{blue\}%k}"
   )
 
 
@@ -301,7 +299,7 @@ function prompt_oppa_lana_style_setup {
     local _fg=$(_color "${colors[directory_foreground]:-white}" f) _bg=$(_color "${colors[directory_background]:-blue}" k)
     local _fg2=$(_color "${colors[directory_background]:-blue}" f)
 
-    prompt_oppa_lana_style_style_formats[directory]="${_fg}${_bg} %~ ${_fg2::=${_fg2//\[48;/[38;}}%K{white}"
+    prompt_oppa_lana_style_formats[directory]="${_fg}${_bg} %~ ${_fg2::=${_fg2//\[48;/[38;}}%K{white}"
   fi
 
   local prompt_symbol=${formats[symbol]:-$'\n'%B${colors[prompt_background]:+%K{$colors[prompt_background]}}%(!.%F{1}.%F{${colors[prompt_foreground]:-white}})${symbols[prompt]:-'%#'}${reset} }
@@ -345,7 +343,7 @@ function enrich_append {
 }
 
 function prompt_oppa_lana_style_build_git_prompt {
-  typeset -A symbols=( "${(@fkv)prompt_oppa_lana_style_style_symbols}" )
+  typeset -A symbols=( "${(@fkv)prompt_oppa_lana_style_symbols}" )
 
   local black_on_white="%F{black}%K{white}"
   local yellow_on_white="%F{yellow}%K{white}"
@@ -372,7 +370,7 @@ function prompt_oppa_lana_style_build_git_prompt {
   (( staged > 0 && unstaged == 0 )) && omg[ready_to_commit]=true
 
   local dir
-  zformat -f dir $prompt_oppa_lana_style_style_formats[directory] "~:$_prompt_oppa_lana_style_pwd"
+  zformat -f dir $prompt_oppa_lana_style_formats[directory] "~:$_prompt_oppa_lana_style_pwd"
 
   local prompt="${dir} ${black_on_white}  "
 
@@ -435,7 +433,7 @@ function prompt_oppa_lana_style_build_git_prompt {
 
   prompt+=$(enrich_append "$omg[tag]" "$symbols[is_on_a_tag] $omg[tag]" "$black_on_red")
   prompt+="%F{red}%k$reset"
-#	prompt+="${prompt_oppa_lana_style_style_formats[suffix]}"
+#	prompt+="${prompt_oppa_lana_style_formats[suffix]}"
 #	prompt+="$(eval_prompt_callback_if_present)"
 #	prompt+="${omg_second_line}"
 
@@ -463,7 +461,7 @@ function prompt_oppa_lana_style_async_callback {
       if [[ -z "$_git_target" ]]; then
         # No git target detected, flush the git fragment and redisplay the prompt.
         _prompt_oppa_lana_style_git=''
-        _prompt_oppa_lana_style_no_git=$prompt_oppa_lana_style_style_formats[no-git]
+        _prompt_oppa_lana_style_no_git=$prompt_oppa_lana_style_formats[no-git]
         zle && zle reset-prompt
       else
         # Git target detected, update the git fragment and redisplay the prompt.

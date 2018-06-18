@@ -24,12 +24,6 @@ zstyle ':prezto:module:prompt:oppa-lana-style' colors prompt_foreground yellow u
 
 zstyle -t ':prezto:module:prompt:*' symbols prompt || zstyle ':prezto:module:prompt:*' symbols prompt "${prompt_symbol}"
 
-zstyle ':prezto:module:prompt:oppa-lana-style' 'prompt-formats' \
-            'no-git'  "%F{white}%K{blue} %~ %F{blue}%k"
-#             suffix "%F{244}%K{239} %n@%m %F{239}%K{57}%F{white} %~ %F{57}%k"$'\n'" %F{yellow}%k${prompt_symbol} %f%k%b" \
-#             prefix "%F{244}%K{239} %n@%m %F{239}%K{57}%F{white} %25<...<%~%<< %F{57}%K{white}" \
-#             rprompt "%(?..%F{$red}%? ↵%f)" \
-
 source $zdotdir/.dotfiles/zsh/dot/zplugrc.prezto
 
 zstyle ‘:completion:*’ verbose yes
