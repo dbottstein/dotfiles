@@ -3,5 +3,6 @@ application/x-zip;		unzip -l "%s";needsterminal;copiousoutput
 application/x-rar;		unrar l "%s";needsterminal;copiousoutput
 application/x-tar;		tar tf "%s";needsterminal;copiousoutput
 application/x-tar-gz;	tar tzf "%s";needsterminal;copiousoutput
+application/x-plist;	open -a "BBEdit" "$s"
 
 text/html;				open -a "Safari" "%s"

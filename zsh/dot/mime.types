@@ -3,6 +3,7 @@ application/x-zip		zip
 application/x-rar		rar
 application/x-tar		tar
 application/x-tar-gz	tar.gz
+application/x-plist		plist
 
 text/html			html htm
 

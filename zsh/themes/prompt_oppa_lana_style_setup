@@ -372,7 +372,7 @@ function prompt_oppa_lana_style_build_git_prompt {
   local dir
   zformat -f dir $prompt_oppa_lana_style_formats[directory] "~:$_prompt_oppa_lana_style_pwd"
 
-  local prompt="${dir} ${black_on_white}  "
+  local prompt="${dir} ${black_on_white} "
 
   # on filesystem (unstaged)
 
