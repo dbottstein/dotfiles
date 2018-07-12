@@ -178,19 +178,19 @@ function prompt_oppa_lana_style_precmd {
 
   # Handle updating git data. We also clear the git prompt data if we're in a
   # different git root now.
-  if (( $+functions[git-dir] )); then
-    local new_git_root="$(git-dir 2> /dev/null)"
-    if [[ $new_git_root != $_oppa_lana_style_cur_git_root ]]; then
-      _prompt_oppa_lana_style_git=''
-      _prompt_oppa_lana_style_no_git=''
-      _oppa_lana_style_cur_git_root=$new_git_root
-    fi
-    if [[ -z "$new_git_root" ]]; then
-      local format
-      zformat -f format $prompt_oppa_lana_style_formats[no-git] "~:$_prompt_oppa_lana_style_pwd"
-      _prompt_oppa_lana_style_no_git=format
-      return
-    fi
+  local new_git_root=${$(command git rev-parse --git-dir 2> /dev/null):A}
+
+  if [[ $new_git_root != $_oppa_lana_style_cur_git_root ]]; then
+    _oppa_lana_style_cur_git_root=$new_git_root
+
+    [[ -n "$new_git_root" ]] && _prompt_oppa_lana_style_prompt=$(prompt_oppa_lana_style_loading_git_prompt)
+  fi
+
+  if [[ -z "$new_git_root" ]]; then
+    local format
+    zformat -f format $prompt_oppa_lana_style_formats[no-git] "~:$_prompt_oppa_lana_style_pwd"
+    _prompt_oppa_lana_style_prompt=$format
+    return
   fi
 
   prompt_oppa_lana_style_async_tasks
@@ -284,8 +284,7 @@ function prompt_oppa_lana_style_setup {
 
   # Get the async worker set up
   _oppa_lana_style_cur_git_root=''
-  _prompt_oppa_lana_style_git=''
-  _prompt_oppa_lana_style_no_git=''
+  _prompt_oppa_lana_style_prompt=''
   _prompt_oppa_lana_style_pwd=''
 
   # Default is to show the return value
@@ -307,7 +306,7 @@ function prompt_oppa_lana_style_setup {
 #   [[ "${prompt_symbol:0:1}" == $'\n' ]] && is_newline=true
 
   # Define prompts.
-  PROMPT='${_prompt_oppa_lana_style_no_git}${_prompt_oppa_lana_style_git}'
+  PROMPT='${_prompt_oppa_lana_style_prompt}'
   PROMPT+=${prompt_symbol}
 #   PROMPT+='${editor_info[keymap]} '
 
@@ -321,7 +320,7 @@ function prompt_oppa_lana_style_setup {
 }
 
 function _color {
-    if [[ ${1:0:1} == $'\e' ]]; then echo %{$1%}; else echo ${2:+%${(U)2}{$1}}; fi
+  if [[ ${1:0:1} == $'\e' ]]; then echo %{$1%}; else echo ${2:+%${(U)2}{$1}}; fi
 }
 
 function prompt_oppa_lana_style_preview {
@@ -440,6 +439,22 @@ function prompt_oppa_lana_style_build_git_prompt {
   print -n "$prompt"
 }
 
+function prompt_oppa_lana_style_loading_git_prompt {
+  typeset -A symbols=( "${(@fkv)prompt_oppa_lana_style_symbols}" )
+
+  local black_on_white="%F{black}%K{white}"
+  local reset='%f%k%b'
+  local dir
+
+  zformat -f dir $prompt_oppa_lana_style_formats[directory] "~:$_prompt_oppa_lana_style_pwd"
+
+  local prompt="${dir} ${black_on_white} "
+  prompt+=$(enrich_append true "$symbols[is_a_git_repo] ... " "$black_on_white")
+  prompt+="%F{white}%k$reset"
+
+  print -n "$prompt"
+}
+
 function prompt_oppa_lana_style_async_callback {
   case $1 in
     prompt_oppa_lana_style_async_git)
@@ -460,8 +475,7 @@ function prompt_oppa_lana_style_async_callback {
 
       if [[ -z "$_git_target" ]]; then
         # No git target detected, flush the git fragment and redisplay the prompt.
-        _prompt_oppa_lana_style_git=''
-        _prompt_oppa_lana_style_no_git=$prompt_oppa_lana_style_formats[no-git]
+        _prompt_oppa_lana_style_prompt=$prompt_oppa_lana_style_formats[no-git]
         zle && zle reset-prompt
       else
         # Git target detected, update the git fragment and redisplay the prompt.
@@ -488,7 +502,7 @@ function prompt_oppa_lana_style_async_callback {
 
 #         echo "${(@fkv)omg}"
 
-        _prompt_oppa_lana_style_git="$(prompt_oppa_lana_style_build_git_prompt)"
+        _prompt_oppa_lana_style_prompt="$(prompt_oppa_lana_style_build_git_prompt)"
         zle && zle reset-prompt
       fi
       ;;
