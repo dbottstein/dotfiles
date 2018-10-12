@@ -36,7 +36,7 @@ setopt                       \
      NO_glob_assign          \
         glob_complete        \
      NO_glob_dots            \
-     NO_glob_subst           \
+        glob_subst           \
      NO_global_export        \
         hash_cmds            \
         hash_dirs            \
@@ -65,7 +65,7 @@ setopt                       \
      NO_mark_dirs            \
      NO_menu_complete        \
         multios              \
-     NO_multibyte            \
+        multibyte            \
         nomatch              \
         notify               \
         null_glob            \
