@@ -1,0 +1,1 @@
+alias -- response.queue="curl -u admin:admin 'http://10.251.218.51:8161/api/jolokia/exec/org.apache.activemq:brokerName=localhost,destinationName=com.comcast.vod.servicebus.response,destinationType=Queue,type=Broker/browse()'"

@@ -4,13 +4,10 @@ umask 002
 autoload -U zsh-mime-setup
 zsh-mime-setup
 
-if [ -z "$prompt_symbol" ]; then
-    case "$OSTYPE" in
-        darwin*) prompt_symbol="" ;;   # 
-        cygwin*) prompt_symbol="" ;;
-        linux*) prompt_symbol="" ;;
-        *) prompt_symbol="⦿" ;;
-    esac
+typeset -U plugins_prezto plugins_omz plugins_github plugins_local
+
+if [ -e "$zdotdir/.dotfiles/zsh/init.zsh.${system:l}" ]; then
+    source $zdotdir/.dotfiles/zsh/init.zsh.${system:l}
 fi
 
 # \033[38;2;<r>;<g>;<b>m     #Select RGB foreground color
@@ -21,8 +18,9 @@ fi
 zstyle ':prezto:module:prompt:qoup'            colors prompt yellow user 244
 zstyle ':prezto:module:prompt:oppa-lana-style' colors prompt_foreground yellow user_foreground 244
 #zstyle ':prezto:module:prompt:*' symbols return ""
+#zstyle ':vcs_info:*:prompt:bira:*' colors prompt yellow user 244
 
-zstyle -t ':prezto:module:prompt:*' symbols prompt || zstyle ':prezto:module:prompt:*' symbols prompt "${prompt_symbol}"
+zstyle -t ':prezto:module:prompt:*' symbols prompt || zstyle ':prezto:module:prompt:*' symbols prompt "⦿"
 
 source $zdotdir/.dotfiles/zsh/dot/zplugrc.prezto
 
@@ -31,5 +29,3 @@ zstyle ‘:completion:*:descriptions’ format ‘%B%d%b’
 zstyle ‘:completion:*:messages’ format ‘%d’
 zstyle ‘:completion:*:warnings’ format ‘No matches for: %d’
 zstyle ‘:completion:*’ group-name ”
-
-unset prompt_symbol

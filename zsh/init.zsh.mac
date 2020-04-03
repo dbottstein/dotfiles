@@ -1,0 +1,8 @@
+plugins_omz+=( osx )
+
+[ $commands[brew] ] && plugins_prezto+=( homebrew )
+
+open -Ra "BBEdit" 2> /dev/null && plugins_omz+=( bbedit )
+open -Ra "iTerm"  2> /dev/null && plugins_local+=( iterm2 )
+
+zstyle ':prezto:module:prompt:*' symbols prompt ""
