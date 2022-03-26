@@ -1,4 +1,4 @@
-HISTFILE=~/.histfile
+HISTFILE="$XDG_STATE_HOME"/zsh/history
 HISTSIZE=1000
 SAVEHIST=1000
 MAILCHECK=0 ## disable mail checking
@@ -6,11 +6,11 @@ WORDCHARS=${WORDCHARS//[\/=;]}
 
 CASE_SENSITIVE="false"
 COMPLETION_WAITING_DOTS="true"
+ENABLE_CORRECTION="true"
 HYPHEN_INSENSITIVE="true"
+DISABLE_AUTO_TITLE="false"
 DISABLE_AUTO_UPDATE="false"
 DISABLE_LS_COLORS="false"
-DISABLE_AUTO_TITLE="false"
-ENABLE_CORRECTION="true"
 # export UPDATE_ZSH_DAYS=13
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -23,7 +23,7 @@ plugins_github+=( Tarrasch/zsh-autoenv Tarrasch/zsh-bd )
 
 fpath=( ~/lib/functions $fpath )
 
-source $zdotdir/.dotfiles/zsh/init.zsh
+source $zdotdir/init.zsh
 
 path=( . ~/bin $path )
 cdpath=( .. ~ ~/src )

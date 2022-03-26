@@ -1,6 +1,4 @@
-zsh=$zdotdir/.dotfiles/zsh
-
-fpath+=( $zsh/themes )
+fpath+=( $zdotdir/themes )
 
 typeset -Ua prezto_modules=(
 	environment
@@ -35,13 +33,12 @@ zplug "sorin-ionescu/prezto", \
     use:"init.zsh", \
     hook-build:"ln -s $ZPLUG_HOME/repos/sorin-ionescu/prezto ~/.zprezto"
 
-
 zstyle ':prezto:*:*' color 'yes'
 zstyle ':prezto:module:prompt' theme "${theme:-oppa_lana_style}"
 zstyle ':prezto:module:editor' key-bindings 'emacs'
 zstyle ':prezto:module:editor' dot-expansion 'yes'
 #zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'	# glitch with multi-line prompt
-zstyle ':prezto:load' pmodule-dirs $zsh/prezto/modules
+zstyle ':prezto:load' pmodule-dirs $zdotdir/prezto/modules
 zstyle ':prezto:load' pmodule $prezto_modules
 
 for plugin in $plugins_omz; do
@@ -53,12 +50,12 @@ for plugin in $plugins_github; do
 done
 
 for plugin in $plugins_local; do
-    zplug "$zsh/plugins/$plugin", from:local
+    zplug "$zdotdir/plugins/$plugin", from:local
 done
 
 # Custom zsh configuration
-zplug "$zsh/lib", from:local
-zplug "$zsh/bin", from:local, as:command, use:"*"
+zplug "$zdotdir/conf.d", from:local
+zplug "$zdotdir/bin", from:local, as:command, use:"*"
 
 zplug check || zplug install
 zplug load

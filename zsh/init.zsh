@@ -6,8 +6,8 @@ zsh-mime-setup
 
 typeset -U plugins_prezto plugins_omz plugins_github plugins_local
 
-if [ -e "$zdotdir/.dotfiles/zsh/init.zsh.${system:l}" ]; then
-    source $zdotdir/.dotfiles/zsh/init.zsh.${system:l}
+if [ -e "$zdotdir/init.zsh.${system:l}" ]; then
+    source $zdotdir/init.zsh.${system:l}
 fi
 
 # \033[38;2;<r>;<g>;<b>m     #Select RGB foreground color
@@ -22,10 +22,10 @@ zstyle ':prezto:module:prompt:oppa-lana-style' colors prompt_foreground yellow u
 
 zstyle -t ':prezto:module:prompt:*' symbols prompt || zstyle ':prezto:module:prompt:*' symbols prompt "⦿"
 
-source $zdotdir/.dotfiles/zsh/dot/zplugrc.prezto
+source $zdotdir/.zplugrc
 
-zstyle ‘:completion:*’ verbose yes
-zstyle ‘:completion:*:descriptions’ format ‘%B%d%b’
-zstyle ‘:completion:*:messages’ format ‘%d’
-zstyle ‘:completion:*:warnings’ format ‘No matches for: %d’
-zstyle ‘:completion:*’ group-name ”
+#zstyle ‘:completion:*’ verbose yes
+#zstyle ‘:completion:*:descriptions’ format ‘%B%d%b’
+#zstyle ‘:completion:*:messages’ format ‘%d’
+#zstyle ‘:completion:*:warnings’ format ‘No matches for: %d’
+#zstyle ‘:completion:*’ group-name ”

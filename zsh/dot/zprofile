@@ -10,11 +10,14 @@ export EDITOR=vi
 export LESS="-RSi"
 export PAGER="less"
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.ajoberstar.grgit.auth.sshagent.allow=false -Dorg.ajoberstar.grgit.auth.pageant.allow=false'
+export ZPLUG_HOME="$XDG_CONFIG_HOME/zplug"
+
+test -r $XDG_STATE_HOME/brew/github_api_token && export HOMEBREW_GITHUB_API_TOKEN=$(cat $XDG_STATE_HOME/brew/github_api_token)
 
 case "$system" in
     Mac)
 	export BROWSER=Safari
-	export JAVA_HOME=$(/usr/libexec/java_home)
+	export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 	;;
     *)
 	export BROWSER=Chrome

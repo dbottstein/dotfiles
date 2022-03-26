@@ -39,6 +39,8 @@ case $OSTYPE in
         alias -- mark='open -a MacDown'
         alias -- preview='open -a Preview'
         alias -- edit='open -a BBEdit'
+        alias -- bbedit='open -a BBEdit'
+        alias -- quick='qlmanage -p'
 
         if [[ -x "${commands[gls]}" ]]; then
             alias -- gls='gls -F --color=auto'

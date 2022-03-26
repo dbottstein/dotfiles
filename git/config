@@ -1,0 +1,81 @@
+[user]
+    name = Don Bottstein
+    email = don@bottstein.com
+	
+[github]
+    user = dbottstein
+
+[core]
+    excludesfile = ~/.config/git/gitignore_global
+    autocrlf = input
+    pager = "diff-so-fancy | less --tabs=4 -RFX"
+    
+[init]
+    defaultBranch = master
+
+[interactive]
+    diffFilter = diff-so-fancy --patch
+
+[difftool "sourcetree"]
+    cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+    path = 
+
+[mergetool "sourcetree"]
+    cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+    trustExitCode = true
+
+[commit]
+    template = /Users/don/.stCommitMsg
+    
+[fetch]
+    prune = true
+
+[pull]
+    rebase = true
+
+[alias]
+    hide = update-index –skip-worktree
+    unhide = update-index –no-skip-worktree
+    unhide-all = ls-files -v | grep -i ^S | cut -c 3- | xargs git update-index –no-skip-worktree
+    hidden = ! git ls-files -v | grep ‘^S’ | cut -c3-
+
+    amend = commit --amend --reuse-message=HEAD
+	br = branch
+	ci = commit
+	co = checkout
+	contrib = shortlog --summary --numbered
+	cr = clone --recursive
+	df = diff --word-diff
+	g = grep --break --heading --line-number
+	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	ld = "!sh -c \"git log --since '${1:-1} days ago' --oneline --author $(git config user.email)\" -"
+	lg = log -p
+	ll = log --pretty=oneline --graph --abbrev-commit
+	lm = log --pretty=format:'* %s (%h)'
+	patch = !git --no-pager diff --no-color
+	p = push
+	pf = push --force
+	pr = "!f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1 && git checkout pr/$1; }; f"
+	show-ignored = "! git clean -ndX | perl -pe 's/Would remove/Ignored:/'"
+	st = status
+	stl = ls-files -m -o --exclude-standard
+	sts = status -sb
+	unstage = reset --hard HEAD
+
+[color]
+    ui = true
+
+[color "diff-highlight"]
+	oldNormal    = red bold
+	oldHighlight = red bold 52
+	newNormal    = green bold
+	newHighlight = green bold 22
+
+[color "diff"]
+    meta       = 11
+    frag       = magenta bold
+    func       = 146 bold
+    commit     = yellow bold
+    old        = red bold
+    new        = green bold
+    whitespace = red reverse
