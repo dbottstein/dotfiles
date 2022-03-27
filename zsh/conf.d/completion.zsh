@@ -11,7 +11,6 @@ zstyle ‘:completion:*:messages’ format ‘%d’
 # zstyle ‘:completion:*:warnings’ format ‘No matches for: %d’
 # zstyle ‘:completion:*’ group-name ”
 
-
 # ignore files already given for rm, kill, diff
 zstyle ':completion:*:(rm|kill|diff):*' ignore-line yes
 
