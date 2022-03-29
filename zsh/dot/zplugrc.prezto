@@ -4,15 +4,12 @@ typeset -Ua prezto_modules=(
 	environment
 	terminal
 	editor
-	history
 	utility
 	spectrum
 	python
 	rsync
 	prompt
-	completion
 	syntax-highlighting
-	history-substring-search
 	autosuggestions
 	fasd
 	$plugins_prezto
