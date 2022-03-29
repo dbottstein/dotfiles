@@ -5,7 +5,9 @@ function fish_greeting -d "What's up, fish?"
     set_color normal
 
     if status is-interactive
-        echo
-        fortune -a
+        if command -q fortune
+            echo
+            fortune -a
+        end
     end
 end
