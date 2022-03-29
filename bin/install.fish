@@ -6,3 +6,4 @@ set -qU XDG_DATA_DIRS;   or set --universal --export --path XDG_DATA_DIRS /usr/l
 set -qU XDG_CONFIG_DIRS; or set --universal --export --path XDG_CONFIG_DIRS /etc/xdg
 
 fish_add_path ~/bin /usr/local/bin
+set --universal --export fisher_path $XDG_DATA_HOME/fisher
