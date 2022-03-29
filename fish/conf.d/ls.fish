@@ -9,5 +9,5 @@ if ! set -qx LS_COLORS && set -l cmd (command -s {g,}dircolors)[1]
             break
         end
     end
-    fenv eval "$cmd -b $colorfile"
+    fenv (eval "$cmd -b $colorfile")
 end
