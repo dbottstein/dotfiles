@@ -1,12 +1,8 @@
-[user]
-    name = Don Bottstein
-    email = don@bottstein.com
-	
 [github]
     user = dbottstein
 
 [core]
-    excludesfile = ~/.config/git/gitignore_global
+    excludesfile = ~/.config/git/ignore
     autocrlf = input
     pager = "diff-so-fancy | less --tabs=4 -RFX"
     
@@ -15,20 +11,6 @@
 
 [interactive]
     diffFilter = diff-so-fancy --patch
-
-[difftool "sourcetree"]
-    cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-    path = 
-
-[mergetool "sourcetree"]
-    cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-    trustExitCode = true
-
-[commit]
-    template = /Users/don/.stCommitMsg
-    
-[fetch]
-    prune = true
 
 [pull]
     rebase = true
@@ -79,3 +61,7 @@
     old        = red bold
     new        = green bold
     whitespace = red reverse
+
+[include]
+    path = ~/.config/git/config-local
+

@@ -2,6 +2,8 @@
 ._*
 .DS_Store
 .idea
+.autoenv.zsh
+.envrc
 node_modules
 bower_components
 npm-debug.log
