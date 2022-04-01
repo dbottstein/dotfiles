@@ -24,7 +24,7 @@ function ls --description 'List contents of directory'
         end
     end
 
-    isatty stdout; and set -a opt -F
+    isatty stdout; and set -a opt -FH
 
     command $__fish_ls_command $__fish_ls_color_opt $opt $argv
 end
