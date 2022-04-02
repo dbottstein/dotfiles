@@ -4,13 +4,12 @@ function bd --argument-names dir --description "traverse parent directories"
         return 0
     end
     
-    if string match --quiet --regex '\d+' -- "$dir"
+    if string match --quiet --regex -- '\d+' "$dir"
         cd (string repeat -n $dir "../")
         return 0
     end
 
     set -l nodes (string split '/' $PWD)[-2..2] "/"
-    #set nodes $nodes[(math (count $nodes) - 1)..2]
     
     for x in (seq 1 (count $nodes))
         if test "$dir" = "$nodes[$x]"
