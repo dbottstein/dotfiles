@@ -1,3 +1,7 @@
 function fd -d "Find directory"
-	find . -type d -name $argv
+    if command -q fd
+        command fd --follow --type d $argv
+    else
+	    find . -type d -name $argv
+	end
 end
