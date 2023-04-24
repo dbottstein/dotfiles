@@ -1,7 +1,7 @@
 set -gx GREP_COLOR '1;32'
 set -gx GREP_OPTIONS
 
-if eval "echo | grep --color=auto '' 2> /dev/null"
+if eval "echo | grep --color=auto '' &> /dev/null"
 	set -a GREP_OPTIONS "--color=auto"
 end
 
