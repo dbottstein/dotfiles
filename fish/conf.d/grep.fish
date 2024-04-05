@@ -8,9 +8,9 @@ end
 # Avoid VCS folders
 
 if eval "echo | grep --exclude-dir=.git '' &> /dev/null"
-	set -a GREP_OPTIONS " --exclude-dir=.git --exclude-dir=node_modules"
+	set -a GREP_OPTIONS "--exclude-dir=.git" "--exclude-dir=node_modules"
 else
 	if eval "echo | grep --exclude=.git '' &> /dev/null"
-		set -a GREP_OPTIONS "--exclude=.git --exclude=node_modules"
+		set -a GREP_OPTIONS "--exclude=.git" "--exclude=node_modules"
 	end
 end
