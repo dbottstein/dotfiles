@@ -21,6 +21,7 @@ test -L ${XDG_CONFIG_HOME:-$HOME/.config}/vim  || ln -sv $base_path/vim ${XDG_CO
 
 mkdir -p ~/.local/bin ~/.local/lib
 
-[ -n "$(which bash)" ] && bash -c "source $script_path/install.bash"
-[ -n "$(which zsh)"  ] && zsh -c "source $script_path/install.zsh"
-[ -n "$(which fish)" ] && fish -c "source $script_path/install.fish"
+command -v bash >/dev/null && bash -c "source $script_path/install.bash"
+command -v zsh >/dev/null  && zsh -c "source $script_path/install.zsh"
+command -v fish >/dev/null && fish -c "source $script_path/install.fish"
+command -v vim >/dev/null  && vim -E -c PlugInstall -c 'qa!'

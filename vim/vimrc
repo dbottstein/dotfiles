@@ -1,7 +1,119 @@
-set tabstop=4
-set shiftwidth=4
+set nocompatible    "compatibility with vi which can cause unexpected issues.
+set runtimepath+=~/.config/vim
 set background=dark
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
 set t_ut=
+set number
+set cursorline
+set nobackup
+set noswapfile
+set scrolloff=5
+set nowrap
+set incsearch
+set ignorecase
+set smartcase
+set showcmd     "Show partial command you type in the last line of the screen.
+set showmode
+set showmatch
+set hlsearch
+set history=1000
+set ve+=onemore
+set nojoinspaces
 
-colorscheme solarized
+" Enable auto completion menu after pressing TAB.
+set wildmenu
+
+" Make wildmenu behave like similar to Bash completion.
+set wildmode=list:longest
+
+" There are certain files that we would never want to edit with Vim.
+" Wildmenu will ignore files with these extensions.
+set wildignore=*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx
+
+colorscheme onedark
 syntax on
+filetype on         "detect the type of file in use.
+filetype plugin on  "load plugins for the detected file types.
+filetype indent on  "Load indent files for the detected file types.
+
+let mapleader = ","
+nnoremap <leader>, :nohlsearch<CR>
+noremap $ $l
+
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-h> <c-w>h
+nnoremap <c-l> <c-w>l
+noremap <c-up> <c-w>+
+noremap <c-down> <c-w>-
+noremap <c-left> <c-w>>
+noremap <c-right> <c-w><
+
+nnoremap <leader>n :NERDTreeFocus<CR>
+nnoremap <C-n> :NERDTree<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-f> :NERDTreeFind<CR>
+
+let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', '\.pyc$', '\.odt$', '\.png$', '\.gif$', '\.db$']
+
+" PLUGINS ---------------------------------------------------------------- {{{
+call plug#begin('~/.local/share/vim/plugged')
+
+Plug 'preservim/nerdtree'
+Plug 'dag/vim-fish'
+
+call plug#end()
+" }}}
+
+
+" MAPPINGS --------------------------------------------------------------- {{{
+
+" Mappings code goes here.
+
+" }}}
+
+
+" VIMSCRIPT -------------------------------------------------------------- {{{
+
+" This will enable code folding.
+" Use the marker method of folding.
+augroup filetype_vim
+    autocmd!
+    autocmd FileType vim setlocal foldmethod=marker
+augroup END
+
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists('s:std_in') |
+    \ execute 'NERDTree' argv()[0] | wincmd p | enew | execute 'cd '.argv()[0] | endif
+
+" Display cursorline and cursorcolumn ONLY in active window.
+augroup cursor_off
+    autocmd!
+    autocmd WinLeave * set nocursorline nocursorcolumn
+    autocmd WinEnter * set cursorline cursorcolumn
+augroup END
+
+" }}}
+
+
+" STATUS LINE ------------------------------------------------------------ {{{
+
+" Clear status line when vimrc is reloaded.
+set statusline=
+
+" Status line left side.
+set statusline+=\ %F\ %M\ %Y\ %R
+
+" Use a divider to separate the left side from the right side.
+set statusline+=%=
+
+" Status line right side.
+set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%\ 
+
+" Show the status on the second to last line.
+set laststatus=2
+
+" }}}
