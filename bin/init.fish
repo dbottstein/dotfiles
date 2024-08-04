@@ -8,7 +8,7 @@ set -q XDG_DATA_DIRS;    or set --universal --export --path XDG_DATA_DIRS /usr/l
 fish_add_path ~/.local/bin /usr/local/bin
 set --universal --export fisher_path $XDG_DATA_HOME/fisher
 
-if ! test -f $XDG_DATA_HOME/fisher/functions/fisher.fish then
+if ! test -f $XDG_DATA_HOME/fisher/functions/fisher.fish
     curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
 
     fisher install oh-my-fish/plugin-foreign-env
