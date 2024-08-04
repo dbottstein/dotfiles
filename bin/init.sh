@@ -18,10 +18,11 @@ test -L ${XDG_CONFIG_HOME:-$HOME/.config}/zsh  || ln -sv $base_path/zsh ${XDG_CO
 test -L ${XDG_CONFIG_HOME:-$HOME/.config}/fish || ln -sv $base_path/fish ${XDG_CONFIG_HOME:-$HOME/.config}/
 test -L ${XDG_CONFIG_HOME:-$HOME/.config}/git  || ln -sv $base_path/git ${XDG_CONFIG_HOME:-$HOME/.config}/
 test -L ${XDG_CONFIG_HOME:-$HOME/.config}/vim  || ln -sv $base_path/vim ${XDG_CONFIG_HOME:-$HOME/.config}/
+test -L ${XDG_CONFIG_HOME:-$HOME/.config}/nvim  || ln -sv $base_path/nvim ${XDG_CONFIG_HOME:-$HOME/.config}/
 
 mkdir -p ~/.local/bin ~/.local/lib
 
-command -v bash >/dev/null && bash -c "source $script_path/install.bash"
-command -v zsh >/dev/null  && zsh -c "source $script_path/install.zsh"
-command -v fish >/dev/null && fish -c "source $script_path/install.fish"
+command -v bash >/dev/null && bash -c "source $script_path/init.bash"
+command -v zsh >/dev/null  && zsh -c "source $script_path/init.zsh"
+command -v fish >/dev/null && fish -c "source $script_path/init.fish"
 command -v vim >/dev/null  && vim -E -c PlugInstall -c 'qa!'
