@@ -8,8 +8,10 @@ set -q XDG_DATA_DIRS;    or set --universal --export --path XDG_DATA_DIRS /usr/l
 fish_add_path ~/.local/bin /usr/local/bin
 set --universal --export fisher_path $XDG_DATA_HOME/fisher
 
-curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+if ! test -f $XDG_DATA_HOME/fisher/functions/fisher.fish then
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
 
-fisher install oh-my-fish/plugin-foreign-env
-fisher install oh-my-fish/theme-bobthefish
-fisher install patrickf1/colored_man_pages.fish
+    fisher install oh-my-fish/plugin-foreign-env
+    fisher install oh-my-fish/theme-bobthefish
+    fisher install patrickf1/colored_man_pages.fish
+end
