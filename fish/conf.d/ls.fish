@@ -1,7 +1,7 @@
 set -gx LSCOLORS ExGxBxDxCxEgEdxbxgxcxd
 set -gx CLICOLOR 1
 
-if ! set -qx LS_COLORS && set -l cmd (command -s {g,}dircolors)[1]
+if ! set -qx LS_COLORS && set -l cmd (command -s {g,}dircolors)[1] && command -q fenv
     set -l colorfile
     for file in ~/.dir_colors ~/.dircolors /etc/DIR_COLORS
         if test -f $file
