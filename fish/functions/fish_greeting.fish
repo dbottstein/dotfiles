@@ -1,5 +1,5 @@
 function fish_greeting -d "What's up, fish?"
-    set_color $fish_color_autosuggestion
+    set_color $fish_color_comment
     uname -nmsr
 
     set_color normal
