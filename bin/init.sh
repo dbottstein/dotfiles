@@ -19,6 +19,7 @@ test -L ${XDG_CONFIG_HOME:-$HOME/.config}/fish || ln -sv $base_path/fish ${XDG_C
 test -L ${XDG_CONFIG_HOME:-$HOME/.config}/git  || ln -sv $base_path/git ${XDG_CONFIG_HOME:-$HOME/.config}/
 test -L ${XDG_CONFIG_HOME:-$HOME/.config}/vim  || ln -sv $base_path/vim ${XDG_CONFIG_HOME:-$HOME/.config}/
 test -L ${XDG_CONFIG_HOME:-$HOME/.config}/nvim  || ln -sv $base_path/nvim ${XDG_CONFIG_HOME:-$HOME/.config}/
+test -L ${XDG_CONFIG_HOME:-$HOME/.config}/kitty  || ln -sv $base_path/kitty ${XDG_CONFIG_HOME:-$HOME/.config}/
 
 mkdir -p ~/.local/bin ~/.local/lib
 
