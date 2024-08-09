@@ -16,4 +16,4 @@ if ! test -f $XDG_DATA_HOME/fisher/functions/fisher.fish
     fisher install ~/.dotfiles/fish/plugins/colored_man_pages
 end
 
-test -e ${XDG_CONFIG_HOME}/kitty/kitty.conf || ln -sv ${XDG_CONFIG_HOME}/kitty/kitty-$system.conf ${XDG_CONFIG_HOME}/kitty/kitty.conf
+test -e $XDG_CONFIG_HOME/kitty/kitty.conf || ln -sv $XDG_CONFIG_HOME/kitty/kitty-$system.conf $XDG_CONFIG_HOME/kitty/kitty.conf
